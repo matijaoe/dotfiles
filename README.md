@@ -94,7 +94,7 @@ sudo softwareupdate -i -a
 - install command line tools
 ```bash
 xcode-select --install
-    ```
+```
 
 
 ## Homebrew
