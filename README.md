@@ -344,7 +344,41 @@ TODO:
 
 ## SSH
 
-TODO: setup
+[guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
+
+Generate a new SSH key
+```bash
+ssh-keygen -t ed25519 -C "github@matijao.com"
+```
+Add SSH key to the ssh-agent
+
+- Start the ssh-agent in the background.
+```bash
+eval "$(ssh-agent -s)"
+```
+- check to see if your ~/.ssh/config file exists in the default location.
+```bash
+open ~/.ssh/config
+```
+
+- If the file doesn't exist, create the file.
+```bash
+touch ~/.ssh/config
+```
+
+- Open your `~/.ssh/config` file, then modify the file to contain the following lines. If your SSH key file has a different name or path than the example code, modify the filename or path to match your current setup.
+```
+Host github.com
+  AddKeysToAgent yes
+  UseKeychain yes
+  IdentityFile ~/.ssh/id_ed25519
+```
+
+- Add your SSH private key to the ssh-agent and store your passphrase in the keychain. If you created your key with a different name, or if you are adding an existing key that has a different name, replace id_ed25519 in the command with the name of your private key file.
+```bash
+ssh-add --apple-use-keychain ~/.ssh/id_ed25519
+```
+
 
 ## Apps
 
