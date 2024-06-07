@@ -344,6 +344,12 @@ TODO:
 
 ## SSH
 
+Via gh-cli
+```bash
+gh auth login
+```
+or
+
 [guide](https://docs.github.com/en/authentication/connecting-to-github-with-ssh/generating-a-new-ssh-key-and-adding-it-to-the-ssh-agent)
 
 Generate a new SSH key
@@ -379,6 +385,17 @@ Host github.com
 ssh-add --apple-use-keychain ~/.ssh/id_ed25519
 ```
 
+Package managers
+```bash
+corepack enable
+```
+
+Pipx
+```bash
+brew install pipx
+pipx ensurepath
+sudo pipx ensurepath --global # optional to allow pipx actions in global scope. See "Global installation" section below.
+```
 
 ## Apps
 
