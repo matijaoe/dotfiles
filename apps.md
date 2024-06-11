@@ -2,8 +2,6 @@ Apps to install (other from Brew)
 
 ## Manual
 - Tinkertool
-- Screen Studio
-- ChatGPT
 
 ## AppStore
 - Ookla Speedtest
@@ -37,6 +35,8 @@ Apps to install (other from Brew)
 - Daisy Disk (but Intel)
 - Downie (but Intel)
 
+Build manually
+- Cork
 
 PWA
 - Proton Mail
