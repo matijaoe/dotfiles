@@ -3,12 +3,12 @@
 Apps not managed by Homebrew. Some of these have brew casks available, but are installed via the App Store because the paid/licensed version requires App Store purchase or activation.
 
 ## App Store
-- Ookla Speedtest
+- Ookla Speedtest  💵
 - Speediness
 - Shareful
 - Pandan
 - Plain Text Editor
-- Wipr
+- Wipr  💵
 - 1Password for Safari
 - Whisper Transcription  💵
 - Streaks
@@ -21,5 +21,4 @@ Apps not managed by Homebrew. Some of these have brew casks available, but are i
 
 ## Installed via other means
 
-- WakaTime (Xcode extension — separate from brew cask)
-- TinkerTool (download from https://www.bresink.com/osx/TinkerTool.html)
+- [TinkerTool](https://www.bresink.com/osx/TinkerTool.html)
