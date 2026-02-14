@@ -244,6 +244,23 @@ else
 fi
 
 # ============================================================
+# 12. Dock apps
+# ============================================================
+step "12. Dock apps"
+DOCK_FILE="$DOTFILES/dock/${PROFILE}.txt"
+if [[ -f "$DOCK_FILE" ]]; then
+  if command_exists dockutil; then
+    info "Applying Dock layout for $PROFILE..."
+    bash "$DOTFILES/dock/apply.sh" "$PROFILE"
+    success "Done"
+  else
+    warn "dockutil not found — install with: brew install dockutil"
+  fi
+else
+  info "No Dock config for $PROFILE — skipping"
+fi
+
+# ============================================================
 # Summary
 # ============================================================
 step "Setup complete!"

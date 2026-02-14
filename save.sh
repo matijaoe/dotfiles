@@ -31,7 +31,23 @@ brew bundle dump --describe --force --file="$DOTFILES/brew/$PROFILE/Brewfile"
 success "Updated brew/$PROFILE/Brewfile"
 
 # ============================================================
-# 3. Dump npm globals
+# 3. Dump Dock pinned apps
+# ============================================================
+info "Dumping Dock pinned apps..."
+mkdir -p "$DOTFILES/dock"
+defaults read com.apple.dock persistent-apps 2>/dev/null | \
+  python3 -c "
+import sys, re, urllib.parse
+content = sys.stdin.read()
+urls = re.findall(r'\"_CFURLString\"\s*=\s*\"(file://[^\"]+)\"', content)
+for url in urls:
+    path = urllib.parse.unquote(url.replace('file://', '').rstrip('/'))
+    print(path)
+" > "$DOTFILES/dock/${PROFILE}.txt"
+success "Updated dock/${PROFILE}.txt"
+
+# ============================================================
+# 4. Dump npm globals
 # ============================================================
 info "Dumping npm global packages..."
 npm ls -g --depth=0 --json 2>/dev/null | \
@@ -48,7 +64,7 @@ for name, info in sorted(deps.items()):
 success "Updated npm-globals.txt"
 
 # ============================================================
-# 4. Git commit + push
+# 5. Git commit + push
 # ============================================================
 cd "$DOTFILES"
 
