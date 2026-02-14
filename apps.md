@@ -1,43 +1,25 @@
-Apps to install (other from Brew)
+# Manual App Installs
 
-## Manual
-- Tinkertool
+Apps not managed by Homebrew. Some of these have brew casks available, but are installed via the App Store because the paid/licensed version requires App Store purchase or activation.
 
-## AppStore
+## App Store
 - Ookla Speedtest
 - Speediness
 - Shareful
 - Pandan
-- System Color Picker (?)
 - Plain Text Editor
 - Wipr
 - 1Password for Safari
-- Whisper Transcription
+- Whisper Transcription  💵
 - Streaks
 - Codepoint
 - Anybox 💵
 - Amphetamine
 - Dropover 💵
-- Lightweight PDF
-- Coin Tick - Menu Bar Crypto
+- Lightweight PDF  💵
+- Coin Tick
 
-## Cracked
-- iA Writer
-- Things 3
-- Soulver 3 
-- PixelSnap
-- Shottr
-- Little Snitch
-- Proxyman
-- ColorSlurp
-- Forklift
-- Marta
-- Daisy Disk (but Intel)
-- Downie (but Intel)
+## Installed via other means
 
-Build manually
-- Cork
-
-PWA
-- Proton Mail
-- YouTube
+- WakaTime (Xcode extension — separate from brew cask)
+- TinkerTool (download from https://www.bresink.com/osx/TinkerTool.html)

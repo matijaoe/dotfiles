@@ -1,0 +1,5 @@
+theme = vesper
+keybind = shift+enter=text:\n
+macos-titlebar-style = tabs
+
+keybind = cmd+backspace=esc:w

@@ -1,0 +1,29 @@
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[user]
+	name = Matija Osrečki
+	email = github@matijao.com
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIGSPHpfyB1n0tQQ+ACdcrZiEOi5Cwy8rbyC2aRZaLdhc
+[push]
+	autoSetupRemote = true
+[gpg]
+	format = ssh
+	program = gpg
+[commit]
+	gpgsign = true
+[tag]
+	forceSignAnnotated = false
+[gpg "ssh"]
+	program = /Applications/1Password.app/Contents/MacOS/op-ssh-sign
+	allowedSignersFile =
+[core]
+	pager = delta
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true
+	side-by-side = true
+	line-numbers = true

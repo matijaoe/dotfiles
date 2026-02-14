@@ -1,0 +1,223 @@
+tap "alienator88/cask"
+tap "chmouel/lazyworktree", "https://github.com/chmouel/lazyworktree"
+tap "homebrew/autoupdate"
+
+# --- CLI tools ---
+
+# Simple, modern, secure file encryption
+brew "age"
+# Clone of cat(1) with syntax highlighting and Git integration
+brew "bat"
+# Yet another cross-platform graphical process/system monitor
+brew "bottom"
+# GNU File, Shell, and Text utilities
+brew "coreutils"
+# Pack, ship and run any application as a lightweight container
+brew "docker"
+# Disk Usage/Free Utility - a better 'df' alternative
+brew "duf"
+# More intuitive version of du in rust
+brew "dust"
+# Modern, maintained replacement for ls
+brew "eza"
+# Like neofetch, but much faster because written mostly in C
+brew "fastfetch"
+# Simple, fast and user-friendly alternative to find
+brew "fd"
+# Play, record, convert, and stream select audio and video codecs
+brew "ffmpeg"
+# Command-line fuzzy finder written in Go
+brew "fzf"
+# GitHub command-line tool
+brew "gh"
+# Syntax-highlighting pager for git and diff output
+brew "git-delta"
+# Blazing fast terminal-ui for git written in rust
+brew "gitui"
+# Render markdown on the CLI
+brew "glow"
+# Open source programming language to build simple/reliable/efficient software
+brew "go"
+# Improved top (interactive process viewer)
+brew "htop"
+# Command-line benchmarking tool
+brew "hyperfine"
+# Tools and libraries to manipulate images in select formats
+brew "imagemagick"
+# Simple terminal UI for git commands
+brew "lazygit"
+# Lazier way to manage everything docker
+brew "lazydocker"
+# List USB devices, just like the Linux lsusb command
+brew "lsusb"
+# Modern and intuitive terminal-based text editor
+brew "micro"
+# Polyglot runtime manager (asdf rust clone)
+brew "mise"
+# Node version management
+brew "n"
+# NCurses Disk Usage
+brew "ncdu"
+# Command-line Git information tool
+brew "onefetch"
+# 7-Zip (high compression file archiver) implementation
+brew "p7zip"
+# Pinentry for GPG on Mac
+brew "pinentry-mac"
+# Prettier daemon
+brew "prettierd"
+# Pack repository contents into a single AI-friendly file
+brew "repomix"
+# Search tool like grep and The Silver Searcher
+brew "ripgrep"
+# Cross-shell prompt for astronauts
+brew "starship"
+# Official tldr client written in Rust
+brew "tlrc"
+# Internet file retriever
+brew "wget"
+# CLI for Git worktree management, designed for parallel AI agent workflows
+brew "worktrunk"
+# Feature-rich command-line audio/video downloader
+brew "yt-dlp"
+# Shell extension to navigate your filesystem faster
+brew "zoxide"
+# Fish-like fast/unobtrusive autosuggestions for zsh
+brew "zsh-autosuggestions"
+
+# --- Apps ---
+
+# Password manager that keeps all passwords secure behind one password
+cask "1password"
+# Command-line interface for 1Password
+cask "1password-cli"
+# Display management tool
+cask "betterdisplay"
+# Scriptable scratchpad for developers
+cask "boop"
+# Web browser focusing on privacy
+cask "brave-browser"
+# OpenAI's official ChatGPT desktop app
+cask "chatgpt"
+# Anthropic's official Claude desktop app
+cask "claude"
+# Screen capturing tool
+cask "cleanshot"
+# Free app that makes your Internet safer
+cask "cloudflare-warp"
+# OpenAI Codex desktop app
+cask "codex-app"
+# Tool to show live information about the batteries in various devices
+cask "coconutbattery"
+# Claude code parallelisation
+cask "conductor"
+# Plain-text editor for web pages, program source codes and more
+cask "coteditor"
+# Multi-platform client-side cloud file encryption tool
+cask "cryptomator"
+# AI-powered code editor
+cask "cursor"
+# Collaborative team software
+cask "figma"
+# Web browser
+cask "firefox@developer-edition"
+# Virtual video-calling space
+cask "gather"
+# Terminal emulator that uses platform-native UI and GPU acceleration
+cask "ghostty@tip"
+# Desktop client for GitHub repositories
+cask "github"
+# Web browser
+cask "google-chrome"
+# Client for the Google Drive storage service
+cask "google-drive"
+# AI-powered notepad for meetings
+cask "granola"
+# Free and open-source media player
+cask "iina"
+# Menu bar manager
+cask "jordanbaird-ice"
+# File archiver
+cask "keka"
+# Blocks all Keyboard and TouchBar input
+cask "keyboardcleantool"
+# Utility that shows the latest app updates
+cask "latest"
+# lazyworktree - A TUI tool to manage git worktrees
+cask "chmouel/lazyworktree/lazyworktree"
+# App to manage software development and track bugs
+cask "linear-linear"
+# Software for Logitech devices
+cask "logi-options+"
+# Screen and video recording software
+cask "loom"
+# Monitors and reports any microphone and camera activity
+cask "micro-snitch"
+# App to write, plan, collaborate, and get organised
+cask "notion"
+# Calendar for professionals and teams
+cask "notion-calendar"
+# Calculator and converter application
+cask "numi"
+# Knowledge base that works on top of a local folder of plain text Markdown files
+cask "obsidian"
+# Replacement for Docker Desktop
+cask "orbstack"
+# Utility to uninstall apps and remove leftover files from old/uninstalled apps
+cask "pearcleaner"
+# Client for Proton Mail and Proton Calendar
+cask "proton-mail"
+# Control your tools with a few keystrokes
+cask "raycast"
+# JavaScript playground that auto-evaluates as code is typed
+cask "runjs"
+# Tool to reverse the direction of scrolling
+cask "scroll-reverser"
+# Block your own access to distracting websites
+cask "selfcontrol"
+# Team communication and collaboration software
+cask "slack"
+# Music streaming service
+cask "spotify"
+# Native GUI tool for relational databases
+cask "tableplus"
+# Time tracking for developers
+cask "wakatime"
+# AI-powered speech-to-text
+cask "wispr-flow"
+# Application for generating TOTP and HOTP codes
+cask "yubico-authenticator"
+
+# --- Fonts ---
+
+cask "font-cascadia-code"
+cask "font-cascadia-mono"
+cask "font-commit-mono"
+cask "font-dm-mono"
+cask "font-geist"
+cask "font-geist-mono"
+cask "font-hack"
+cask "font-ia-writer-duo"
+cask "font-ia-writer-mono"
+cask "font-ia-writer-quattro"
+cask "font-inconsolata"
+cask "font-inter"
+cask "font-jetbrains-mono"
+cask "font-kode-mono"
+cask "font-martian-mono"
+cask "font-monaspace"
+cask "font-nunito"
+cask "font-open-sans"
+cask "font-overpass-mono"
+cask "font-oxygen-mono"
+cask "font-reddit-mono"
+cask "font-roboto"
+cask "font-roboto-flex"
+cask "font-roboto-mono"
+cask "font-space-mono"
+cask "font-ubuntu"
+cask "font-ubuntu-condensed"
+cask "font-ubuntu-mono"
+cask "font-ubuntu-sans"
+cask "font-ubuntu-sans-mono"
+cask "font-victor-mono"

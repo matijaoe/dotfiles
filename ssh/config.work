@@ -1,0 +1,14 @@
+Host *
+  SetEnv TERM=xterm-256color
+
+# GitHub
+Host github
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/key-github
+  IdentitiesOnly yes
+
+Host *
+  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+
+Include ~/.orbstack/ssh/config
