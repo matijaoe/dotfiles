@@ -1,19 +1,22 @@
 tap "alienator88/cask"
 tap "chmouel/lazyworktree", "https://github.com/chmouel/lazyworktree"
 tap "homebrew/autoupdate"
-
-# --- CLI tools ---
-
 # Simple, modern, secure file encryption
 brew "age"
+# C library of Git core methods that is re-entrant and linkable
+brew "libgit2"
 # Clone of cat(1) with syntax highlighting and Git integration
 brew "bat"
 # Yet another cross-platform graphical process/system monitor
 brew "bottom"
 # GNU File, Shell, and Text utilities
 brew "coreutils"
+# Secure runtime for JavaScript and TypeScript
+brew "deno"
 # Pack, ship and run any application as a lightweight container
 brew "docker"
+# Tool for managing dock items
+brew "dockutil"
 # Disk Usage/Free Utility - a better 'df' alternative
 brew "duf"
 # More intuitive version of du in rust
@@ -44,10 +47,10 @@ brew "htop"
 brew "hyperfine"
 # Tools and libraries to manipulate images in select formats
 brew "imagemagick"
-# Simple terminal UI for git commands
-brew "lazygit"
 # Lazier way to manage everything docker
 brew "lazydocker"
+# Simple terminal UI for git commands
+brew "lazygit"
 # List USB devices, just like the Linux lsusb command
 brew "lsusb"
 # Modern and intuitive terminal-based text editor
@@ -84,9 +87,6 @@ brew "yt-dlp"
 brew "zoxide"
 # Fish-like fast/unobtrusive autosuggestions for zsh
 brew "zsh-autosuggestions"
-
-# --- Apps ---
-
 # Password manager that keeps all passwords secure behind one password
 cask "1password"
 # Command-line interface for 1Password
@@ -99,28 +99,59 @@ cask "boop"
 cask "brave-browser"
 # OpenAI's official ChatGPT desktop app
 cask "chatgpt"
-# Anthropic's official Claude desktop app
+# Anthropic's official Claude AI desktop app
 cask "claude"
 # Screen capturing tool
 cask "cleanshot"
 # Free app that makes your Internet safer
 cask "cloudflare-warp"
-# OpenAI Codex desktop app
-cask "codex-app"
 # Tool to show live information about the batteries in various devices
 cask "coconutbattery"
+# OpenAI's Codex desktop app for managing coding agents
+cask "codex-app"
 # Claude code parallelisation
 cask "conductor"
 # Plain-text editor for web pages, program source codes and more
 cask "coteditor"
 # Multi-platform client-side cloud file encryption tool
 cask "cryptomator"
-# AI-powered code editor
+# Write, edit, and chat about your code with AI
 cask "cursor"
 # Collaborative team software
 cask "figma"
 # Web browser
 cask "firefox@developer-edition"
+cask "font-cascadia-code"
+cask "font-cascadia-mono"
+cask "font-commit-mono"
+cask "font-dm-mono"
+cask "font-geist"
+cask "font-geist-mono"
+cask "font-hack"
+cask "font-ia-writer-duo"
+cask "font-ia-writer-mono"
+cask "font-ia-writer-quattro"
+cask "font-inconsolata"
+cask "font-inter"
+cask "font-jetbrains-mono"
+cask "font-kode-mono"
+cask "font-martian-mono"
+cask "font-monaspace"
+cask "font-nunito"
+cask "font-open-sans"
+cask "font-overpass-mono"
+cask "font-oxygen-mono"
+cask "font-reddit-mono"
+cask "font-roboto"
+cask "font-roboto-flex"
+cask "font-roboto-mono"
+cask "font-space-mono"
+cask "font-ubuntu"
+cask "font-ubuntu-condensed"
+cask "font-ubuntu-mono"
+cask "font-ubuntu-sans"
+cask "font-ubuntu-sans-mono"
+cask "font-victor-mono"
 # Virtual video-calling space
 cask "gather"
 # Terminal emulator that uses platform-native UI and GPU acceleration
@@ -181,43 +212,9 @@ cask "slack"
 cask "spotify"
 # Native GUI tool for relational databases
 cask "tableplus"
-# Time tracking for developers
+# System tray app for automatic time tracking
 cask "wakatime"
-# AI-powered speech-to-text
+# Voice-to-text dictation with AI-powered auto-editing
 cask "wispr-flow"
 # Application for generating TOTP and HOTP codes
 cask "yubico-authenticator"
-
-# --- Fonts ---
-
-cask "font-cascadia-code"
-cask "font-cascadia-mono"
-cask "font-commit-mono"
-cask "font-dm-mono"
-cask "font-geist"
-cask "font-geist-mono"
-cask "font-hack"
-cask "font-ia-writer-duo"
-cask "font-ia-writer-mono"
-cask "font-ia-writer-quattro"
-cask "font-inconsolata"
-cask "font-inter"
-cask "font-jetbrains-mono"
-cask "font-kode-mono"
-cask "font-martian-mono"
-cask "font-monaspace"
-cask "font-nunito"
-cask "font-open-sans"
-cask "font-overpass-mono"
-cask "font-oxygen-mono"
-cask "font-reddit-mono"
-cask "font-roboto"
-cask "font-roboto-flex"
-cask "font-roboto-mono"
-cask "font-space-mono"
-cask "font-ubuntu"
-cask "font-ubuntu-condensed"
-cask "font-ubuntu-mono"
-cask "font-ubuntu-sans"
-cask "font-ubuntu-sans-mono"
-cask "font-victor-mono"
