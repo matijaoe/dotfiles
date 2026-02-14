@@ -1,0 +1,7 @@
+@anthropic-ai/claude-code
+@google/gemini-cli
+@qwen-code/qwen-code
+ccusage
+surge
+task-master-ai
+trash-cli

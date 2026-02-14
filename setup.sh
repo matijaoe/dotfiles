@@ -213,6 +213,26 @@ else
   success "Claude Code installed (available in new terminal)"
 fi
 
+# OpenCode
+if command_exists opencode; then
+  success "OpenCode already installed"
+else
+  info "Installing OpenCode..."
+  curl -fsSL https://opencode.ai/install | bash
+  success "OpenCode installed (available in new terminal)"
+fi
+
+# Amp Code
+if command_exists amp; then
+  success "Amp Code already installed"
+else
+  info "Installing Amp Code..."
+  curl -fsSL https://ampcode.com/install.sh | bash
+  success "Amp Code installed (available in new terminal)"
+fi
+
+
+
 # ============================================================
 # 10. mise (work profile only)
 # ============================================================
