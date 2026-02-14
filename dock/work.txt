@@ -1,9 +1,6 @@
-/System/Library/CoreServices/Finder.app
 /Applications/Brave Browser.app
 /Applications/Ghostty.app
 /Applications/Cursor.app
-/Applications/Conductor.app
-/Applications/Codex.app
 /Applications/ChatGPT.app
 /Applications/Claude.app
 /Applications/Slack.app
