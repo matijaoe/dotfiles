@@ -1,6 +1,7 @@
 #!/bin/bash
 
 DOTFILES="$HOME/dotfiles"
+BREW_AUTOUPDATE_INTERVAL=86400  # 24 hours in seconds
 
 # ============================================================
 # Helpers
@@ -94,8 +95,18 @@ if [[ ! -f "$BREWFILE" ]]; then
   warn "No Brewfile found at $BREWFILE — skipping"
 else
   info "Installing from $BREWFILE..."
-  brew bundle --file="$BREWFILE" --no-lock || warn "Some packages may have failed — check output above"
+  brew bundle --file="$BREWFILE" || warn "Some packages may have failed — check output above"
   success "Done"
+fi
+
+# Configure brew autoupdate (every 24h)
+if command_exists brew; then
+  info "Configuring brew autoupdate (every 24h)..."
+  # Stop existing autoupdate if running
+  brew autoupdate stop 2>/dev/null || true
+  # Start: upgrade + cleanup every 24h (86400 seconds)
+  brew autoupdate start "$BREW_AUTOUPDATE_INTERVAL" --upgrade --cleanup --immediate
+  success "Brew autoupdate configured"
 fi
 
 # ============================================================
@@ -250,11 +261,10 @@ if [[ ! -f "$HOME/.ssh/key-github" ]]; then
   MANUAL_STEPS+=("Set up SSH key: export from 1Password or generate new (~/.ssh/key-github)")
 fi
 
-if [[ "$PROFILE" == "work" ]]; then
+if [[ "$PROFILE" == "work" ]] && ! docker info &>/dev/null; then
   MANUAL_STEPS+=("Open OrbStack to complete Docker setup")
 fi
 
-MANUAL_STEPS+=("Open a new terminal to load the new shell config")
 MANUAL_STEPS+=("Sign in to App Store for manual app installs (see apps.md)")
 
 if [[ ${#MANUAL_STEPS[@]} -gt 0 ]]; then

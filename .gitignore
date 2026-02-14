@@ -1,3 +1,4 @@
 .DS_Store
 *.bak
 .dotfiles-profile
+Brewfile.lock.json

@@ -87,6 +87,9 @@ defaults write com.apple.finder FXEnableExtensionChangeWarning -bool false
 # Show all file extensions
 defaults write NSGlobalDomain AppleShowAllExtensions -bool true
 
+# Sort folders before files
+defaults write com.apple.finder _FXSortFoldersFirst -bool true
+
 # New Finder windows open Home (PfHm=Home, PfLo=custom path)
 defaults write com.apple.finder NewWindowTarget -string "PfHm"
 defaults write com.apple.finder NewWindowTargetPath -string "file://${HOME}"
