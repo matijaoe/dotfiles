@@ -4,6 +4,7 @@
 /Applications/ChatGPT.app
 /Applications/Claude.app
 /Applications/Slack.app
+/Applications/Gather.app
 /Applications/Linear.app
 /Applications/Notion.app
 /Applications/Notion Calendar.app

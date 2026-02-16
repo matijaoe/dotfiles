@@ -107,6 +107,8 @@ cask "cleanshot"
 cask "cloudflare-warp"
 # Tool to show live information about the batteries in various devices
 cask "coconutbattery"
+# OpenAI's coding agent that runs in your terminal
+cask "codex"
 # OpenAI's Codex desktop app for managing coding agents
 cask "codex-app"
 # Claude code parallelisation

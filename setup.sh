@@ -222,6 +222,15 @@ else
   success "OpenCode installed (available in new terminal)"
 fi
 
+# Cursor CLI
+if command_exists cursor; then
+  success "Cursor already installed"
+else
+  info "Installing Cursor..."
+  curl https://cursor.com/install -fsS | bash
+  success "Cursor installed (available in new terminal)"
+fi
+
 # Amp Code
 if command_exists amp; then
   success "Amp Code already installed"
@@ -230,8 +239,6 @@ else
   curl -fsSL https://ampcode.com/install.sh | bash
   success "Amp Code installed (available in new terminal)"
 fi
-
-
 
 # ============================================================
 # 10. mise (work profile only)

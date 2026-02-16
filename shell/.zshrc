@@ -14,7 +14,6 @@
 # jq                                          (JSON processor)
 # hyperfine "cmd"                             (benchmark commands)
 # lg                               → lazygit  (terminal git UI)
-# gitui                                       (alternative git TUI, Rust)
 # ld                               → lazydocker (terminal docker UI)
 # lwt                              → lazyworktree (git worktree TUI)
 # gh dash                                     (GitHub PR/issues dashboard)
@@ -30,7 +29,6 @@
 # yt-dlp                                      (download videos from YouTube etc.)
 # ncdu                                        (interactive disk usage explorer)
 # fastfetch                                   (system info display)
-# cmatrix                                     (Matrix rain effect)
 #
 # Keybindings:
 # Ctrl+R   → fuzzy history search (fzf)
