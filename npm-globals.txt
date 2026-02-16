@@ -1,3 +1,0 @@
-ccusage
-surge
-trash-cli

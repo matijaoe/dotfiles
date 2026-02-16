@@ -111,6 +111,8 @@ cask "coconutbattery"
 cask "codex"
 # OpenAI's Codex desktop app for managing coding agents
 cask "codex-app"
+# AI agent operator
+cask "commander"
 # Claude code parallelisation
 cask "conductor"
 # Plain-text editor for web pages, program source codes and more
