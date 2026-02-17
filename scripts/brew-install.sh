@@ -1,16 +1,16 @@
 #!/bin/bash
 
 # Install Homebrew packages from Brewfile and configure autoupdate.
-# Usage: bash scripts/brew-install.sh [profile]
-# Example: bash scripts/brew-install.sh work
+# Usage: bash scripts/brew-install.sh [--work|--personal]
+# Example: bash scripts/brew-install.sh --work
 
-set -e
+set -euo pipefail
 
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/common.sh"
 BREW_AUTOUPDATE_INTERVAL=86400  # 24 hours in seconds
 
 # Resolve profile
-PROFILE="$(require_profile "$(basename "$0")" "${1:-}")"
+PROFILE="$(require_profile "$@")"
 
 # Install packages
 BREWFILE="$DOTFILES/packages/brew/$PROFILE/Brewfile"

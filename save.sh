@@ -1,21 +1,22 @@
 #!/bin/bash
-set -e
+set -euo pipefail
 
-DOTFILES="$HOME/dotfiles"
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/scripts/lib/common.sh"
 
-# ============================================================
-# Helpers
-# ============================================================
-info()    { printf "\033[34m→\033[0m %s\n" "$1"; }
-success() { printf "\033[32m✓\033[0m %s\n" "$1"; }
-warn()    { printf "\033[33m!\033[0m %s\n" "$1"; }
+_npm_tmp=""
+_pnpm_tmp=""
+
+cleanup() {
+  [[ -n "${_npm_tmp:-}" && -f "$_npm_tmp" ]] && rm -f "$_npm_tmp"
+  [[ -n "${_pnpm_tmp:-}" && -f "$_pnpm_tmp" ]] && rm -f "$_pnpm_tmp"
+}
+trap cleanup EXIT
 
 # ============================================================
 # 1. Read profile
 # ============================================================
-if [[ -f "$HOME/.dotfiles-profile" ]]; then
-  PROFILE=$(cat "$HOME/.dotfiles-profile")
-else
+PROFILE="$(resolve_profile)"
+if [[ -z "$PROFILE" ]]; then
   echo "No profile found. Run setup.sh first."
   exit 1
 fi
@@ -27,8 +28,12 @@ info "Profile: $PROFILE"
 # ============================================================
 info "Dumping brew packages..."
 mkdir -p "$DOTFILES/packages/brew/$PROFILE"
-brew bundle dump --describe --force --file="$DOTFILES/packages/brew/$PROFILE/Brewfile"
-success "Updated packages/brew/$PROFILE/Brewfile"
+if command_exists brew; then
+  brew bundle dump --describe --force --file="$DOTFILES/packages/brew/$PROFILE/Brewfile"
+  success "Updated packages/brew/$PROFILE/Brewfile"
+else
+  warn "brew not found — skipping Brewfile dump"
+fi
 
 # ============================================================
 # 3. Dump Dock pinned apps
@@ -51,7 +56,7 @@ success "Updated packages/dock/${PROFILE}.txt"
 # ============================================================
 info "Dumping npm global packages..."
 _npm_tmp=$(mktemp)
-if npm ls -g --depth=0 --json 2>/dev/null | \
+if command_exists npm && npm ls -g --depth=0 --json 2>/dev/null | \
   python3 -c "
 import sys, json
 data = json.load(sys.stdin)
@@ -63,10 +68,12 @@ for name, info in sorted(deps.items()):
         print(name)
 " > "$_npm_tmp" 2>/dev/null; then
   mv "$_npm_tmp" "$DOTFILES/packages/npm-globals.txt"
+  _npm_tmp=""
   success "Updated packages/npm-globals.txt"
 else
   rm -f "$_npm_tmp"
-  warn "Failed to dump npm globals — keeping existing file"
+  _npm_tmp=""
+  warn "Failed to dump npm globals or npm not found — keeping existing file"
 fi
 
 # ============================================================
@@ -74,7 +81,7 @@ fi
 # ============================================================
 export PNPM_HOME="$HOME/Library/pnpm"
 export PATH="$PNPM_HOME:$PATH"
-if command -v pnpm &>/dev/null; then
+if command_exists pnpm; then
   info "Dumping pnpm global packages..."
   _pnpm_tmp=$(mktemp)
   if pnpm ls -g --json 2>/dev/null | \
@@ -87,9 +94,11 @@ for store in data:
         print(name)
 " > "$_pnpm_tmp" 2>/dev/null; then
     mv "$_pnpm_tmp" "$DOTFILES/packages/pnpm-globals.txt"
+    _pnpm_tmp=""
     success "Updated packages/pnpm-globals.txt"
   else
     rm -f "$_pnpm_tmp"
+    _pnpm_tmp=""
     warn "Failed to dump pnpm globals — keeping existing file"
   fi
 else
@@ -120,5 +129,5 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
   git push
   success "Saved and pushed"
 else
-  info "Skipped — changes are staged but not committed"
+  info "Skipped — changes are not committed"
 fi

@@ -3,13 +3,15 @@
 # Dotfiles CLI — unified interface for all dotfiles operations
 # Usage: dots <command> [args]
 
-set -e
+set -euo pipefail
 
 # Resolve real path even when called through symlink
-SCRIPT_PATH="$0"
-if [[ -L "$SCRIPT_PATH" ]]; then
+SCRIPT_PATH="${BASH_SOURCE[0]}"
+while [[ -L "$SCRIPT_PATH" ]]; do
+  SCRIPT_DIR="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
   SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
-fi
+  [[ "$SCRIPT_PATH" != /* ]] && SCRIPT_PATH="$SCRIPT_DIR/$SCRIPT_PATH"
+done
 DOTFILES="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
 
 # ============================================================
@@ -19,33 +21,75 @@ info()    { printf "\033[34m→\033[0m %s\n" "$1"; }
 error()   { printf "\033[31m✗\033[0m %s\n" "$1"; }
 
 show_help() {
-  cat <<EOF
-$(printf "\033[1;36mdots\033[0m") — dotfiles management CLI
+  local RESET=$'\033[0m'
+  local BOLD=$'\033[1m'
+  local DIM=$'\033[2m'
+  local CYAN=$'\033[36m'
+  local YELLOW=$'\033[33m'
+  local COL_W=40
+  local EX_W=28
 
-$(printf "\033[1mUsage:\033[0m") dots <command> [args]
+  row() {
+    local plain="$1"
+    local styled="$2"
+    local desc="$3"
+    local pad=$((COL_W - ${#plain}))
+    (( pad < 1 )) && pad=1
+    printf "  %s%*s%s%s%s\n" "$styled" "$pad" "" "$DIM" "$desc" "$RESET"
+  }
 
-$(printf "\033[1mMain commands:\033[0m")
-  $(printf "\033[36msetup\033[0m | \033[36minit\033[0m") [--work|--personal]   Full system setup (new Mac bootstrap)
-  $(printf "\033[36msave\033[0m | \033[36mupdate\033[0m")                      Save current state to repo
-  $(printf "\033[36mrun\033[0m") <script> [args]                Run individual setup script
-
-$(printf "\033[1mAvailable scripts\033[0m") (dots run <script>):
-  brew [profile]              Install Homebrew packages
-  symlinks [profile]          Create config symlinks
-  dock [profile]              Apply Dock layout
-  claude [-y]                 Setup Claude Code configs
-  macos                       Apply macOS system defaults
-  curl                        Install curl-based tools
-
-$(printf "\033[1mExamples:\033[0m")
-  dots setup --work           # bootstrap new work Mac
-  dots save                   # snapshot current state
-  dots run brew               # re-run brew install (uses saved profile)
-  dots run dock work          # apply work dock layout
-  dots run claude             # setup Claude (interactive prompts)
-
-$(printf "\033[2mNote:\033[0m") Scripts read profile from ~/.dotfiles-profile when not specified.
+  printf "\n%b" "$CYAN"
+  cat <<'EOF'
+_________/\\\___________________________________________
+ ________\/\\\___________________________________________
+  ________\/\\\____________________/\\\___________________
+   ________\/\\\______/\\\\\_____/\\\\\\\\\\\__/\\\\\\\\\\_
+    ___/\\\\\\\\\____/\\\///\\\__\////\\\////__\/\\\//////__
+     __/\\\////\\\___/\\\__\//\\\____\/\\\______\/\\\\\\\\\\_
+      _\/\\\__\/\\\__\//\\\__/\\\_____\/\\\_/\\__\////////\\\_
+       _\//\\\\\\\/\\__\///\\\\\/______\//\\\\\____/\\\\\\\\\\_
+        __\///////\//_____\/////_________\/////____\//////////__
 EOF
+  printf "%b\n" "$RESET"
+
+  printf "%b%s%b %s%s%b\n\n" "$BOLD" "dots" "$RESET" "$DIM" "dotfiles management CLI" "$RESET"
+
+  printf "%b%s%b\n" "$BOLD" "USAGE" "$RESET"
+  printf "  %bdots%b <command> [options]\n\n" "$CYAN" "$RESET"
+
+  printf "%b%s%b\n" "$BOLD" "COMMANDS" "$RESET"
+  row "setup, init [--work|--personal]"  "${CYAN}setup${RESET}, ${CYAN}init${RESET} [${YELLOW}--work${RESET}|${YELLOW}--personal${RESET}]"  "Bootstrap or re-run full setup"
+  row "save, update"                     "${CYAN}save${RESET}, ${CYAN}update${RESET}"                     "Save current machine state to repo"
+  row "run <script> [--work|--personal]"  "${CYAN}run${RESET} <script> [${YELLOW}--work${RESET}|${YELLOW}--personal${RESET}]"  "Run a single script"
+  row "help"                             "${CYAN}help${RESET}"                                           "Show this help"
+  printf "\n"
+
+  printf "%b%s%b\n" "$BOLD" "SCRIPTS" "$RESET"
+  row "brew"      "${CYAN}brew${RESET}"      "Install Homebrew packages"
+  row "symlinks"  "${CYAN}symlinks${RESET}"  "Create config symlinks"
+  row "dock"      "${CYAN}dock${RESET}"      "Apply Dock layout"
+  row "macos"     "${CYAN}macos${RESET}"     "Apply macOS defaults"
+  row "claude"    "${CYAN}claude${RESET}"    "Setup Claude Code configs"
+  row "curl"      "${CYAN}curl${RESET}"      "Install curl-based tools"
+  printf "\n"
+
+  printf "%b%s%b\n" "$BOLD" "PROFILES" "$RESET"
+  printf "  Available: %bpersonal%b, %bwork%b\n" "$YELLOW" "$RESET" "$YELLOW" "$RESET"
+  printf "  Resolved in order:\n"
+  printf "    1. Flag        %b--work%b or %b--personal%b\n" "$YELLOW" "$RESET" "$YELLOW" "$RESET"
+  printf "    2. Saved       %b~/.dotfiles-profile%b\n" "$CYAN" "$RESET"
+  printf "    3. Prompt      %basked during setup%b\n\n" "$DIM" "$RESET"
+
+  printf "%b%s%b\n" "$BOLD" "EXAMPLES" "$RESET"
+  printf "  %b%-${EX_W}s%b %b# %s%b\n" "$CYAN" "dots setup --work" "$RESET" "$DIM" "bootstrap new work Mac" "$RESET"
+  printf "  %b%-${EX_W}s%b %b# %s%b\n" "$CYAN" "dots save" "$RESET" "$DIM" "snapshot current state" "$RESET"
+  printf "  %b%-${EX_W}s%b %b# %s%b\n" "$CYAN" "dots run brew" "$RESET" "$DIM" "install Homebrew packages" "$RESET"
+  printf "  %b%-${EX_W}s%b %b# %s%b\n" "$CYAN" "dots run symlinks" "$RESET" "$DIM" "create config symlinks" "$RESET"
+  printf "  %b%-${EX_W}s%b %b# %s%b\n" "$CYAN" "dots run dock --work" "$RESET" "$DIM" "apply work Dock layout" "$RESET"
+  printf "  %b%-${EX_W}s%b %b# %s%b\n" "$CYAN" "dots run macos" "$RESET" "$DIM" "apply macOS defaults" "$RESET"
+  printf "  %b%-${EX_W}s%b %b# %s%b\n" "$CYAN" "dots run claude" "$RESET" "$DIM" "setup Claude Code configs" "$RESET"
+  printf "  %b%-${EX_W}s%b %b# %s%b\n" "$CYAN" "dots run curl" "$RESET" "$DIM" "install curl-based tools" "$RESET"
+  printf "\n"
 }
 
 # ============================================================

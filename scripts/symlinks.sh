@@ -1,15 +1,15 @@
 #!/bin/bash
 
 # Create symlinks for all config files.
-# Usage: bash scripts/symlinks.sh [profile]
-# Example: bash scripts/symlinks.sh work
+# Usage: bash scripts/symlinks.sh [--work|--personal]
+# Example: bash scripts/symlinks.sh --work
 
-set -e
+set -euo pipefail
 
-source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/common.sh"
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/fs.sh"
 
 # Resolve profile
-PROFILE="$(require_profile "$(basename "$0")" "${1:-}")"
+PROFILE="$(require_profile "$@")"
 
 TOTAL=0
 CREATED=0
@@ -18,20 +18,12 @@ link_file() {
   local src="$1"
   local dest="$2"
 
-  mkdir -p "$(dirname "$dest")"
-
   ((TOTAL++)) || true
 
-  if [[ -e "$dest" || -L "$dest" ]]; then
-    if [[ "$(readlink "$dest")" == "$src" ]]; then
-      return 0
-    fi
-    mv "$dest" "${dest}.bak"
+  symlink_with_backup "$src" "$dest"
+  if [[ "$SYMLINK_RESULT" != "already_linked" ]]; then
+    ((CREATED++)) || true
   fi
-
-  ln -s "$src" "$dest"
-  ((CREATED++)) || true
-  return 1
 }
 
 # Shell

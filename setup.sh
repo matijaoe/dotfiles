@@ -1,28 +1,27 @@
 #!/bin/bash
 
-DOTFILES="$HOME/dotfiles"
+set -euo pipefail
 
-# ============================================================
-# Helpers
-# ============================================================
-info()    { printf "  \033[34m•\033[0m %s\n" "$1"; }
-success() { printf "  \033[32m✓\033[0m %s\n" "$1"; }
-warn()    { printf "  \033[33m!\033[0m %s\n" "$1"; }
-section() { printf "\n\033[1;36m➤ %s\033[0m\n" "$1"; }
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/scripts/lib/common.sh"
 
-command_exists() { command -v "$1" &>/dev/null; }
+NPM_INSTALLED_FILE=""
+PNPM_INSTALLED_FILE=""
+
+cleanup() {
+  [[ -n "${NPM_INSTALLED_FILE:-}" && -f "$NPM_INSTALLED_FILE" ]] && rm -f "$NPM_INSTALLED_FILE"
+  [[ -n "${PNPM_INSTALLED_FILE:-}" && -f "$PNPM_INSTALLED_FILE" ]] && rm -f "$PNPM_INSTALLED_FILE"
+}
+trap cleanup EXIT
 
 # ============================================================
 # Parse flags
 # ============================================================
 PROFILE=""
-APPLY_MACOS=false
 
 for arg in "$@"; do
   case "$arg" in
     --work)     PROFILE="work" ;;
     --personal) PROFILE="personal" ;;
-    --macos)    APPLY_MACOS=true ;;
     *)          echo "Unknown flag: $arg"; exit 1 ;;
   esac
 done
@@ -51,7 +50,11 @@ else
   /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 fi
 # Ensure brew is on PATH for this script
-eval "$(/opt/homebrew/bin/brew shellenv)"
+if [[ -x /opt/homebrew/bin/brew ]]; then
+  eval "$(/opt/homebrew/bin/brew shellenv)"
+elif [[ -x /usr/local/bin/brew ]]; then
+  eval "$(/usr/local/bin/brew shellenv)"
+fi
 
 # ============================================================
 # 3. Zinit
@@ -72,8 +75,8 @@ fi
 # ============================================================
 section "Profile"
 if [[ -z "$PROFILE" ]]; then
-  if [[ -f "$HOME/.dotfiles-profile" ]]; then
-    PROFILE=$(cat "$HOME/.dotfiles-profile")
+  PROFILE="$(resolve_profile)"
+  if [[ -n "$PROFILE" ]]; then
     info "Using saved profile: $PROFILE"
   else
     echo "Select profile:"
@@ -89,13 +92,13 @@ echo "$PROFILE" > "$HOME/.dotfiles-profile"
 # 5. Brew bundle
 # ============================================================
 section "Brew packages"
-bash "$DOTFILES/scripts/brew-install.sh" "$PROFILE"
+bash "$DOTFILES/scripts/brew-install.sh" "--$PROFILE"
 
 # ============================================================
 # 6. Symlinks
 # ============================================================
 section "Symlinks"
-bash "$DOTFILES/scripts/symlinks.sh" "$PROFILE"
+bash "$DOTFILES/scripts/symlinks.sh" "--$PROFILE"
 
 # ============================================================
 # 7. Node (n)
@@ -124,9 +127,22 @@ fi
 # ============================================================
 section "npm globals"
 if command_exists npm && [[ -f "$DOTFILES/packages/npm-globals.txt" ]]; then
+  NPM_LIST_READY=true
+  NPM_INSTALLED_FILE="$(mktemp)"
+  if ! npm ls -g --depth=0 --json 2>/dev/null | python3 -c '
+import json, sys
+data = json.load(sys.stdin)
+for name in sorted(data.get("dependencies", {}).keys()):
+    print(name)
+' > "$NPM_INSTALLED_FILE"; then
+    NPM_LIST_READY=false
+    warn "Could not read npm global package list; falling back to per-package checks"
+  fi
   while IFS= read -r pkg; do
-    [[ -z "$pkg" ]] && continue
-    if npm list -g "$pkg" --depth=0 &>/dev/null; then
+    [[ -z "$pkg" || "$pkg" == \#* ]] && continue
+    if [[ "$NPM_LIST_READY" == true ]] && grep -Fxq "$pkg" "$NPM_INSTALLED_FILE"; then
+      success "$pkg"
+    elif npm list -g "$pkg" --depth=0 &>/dev/null; then
       success "$pkg"
     else
       info "Installing $pkg..."
@@ -151,9 +167,29 @@ if command_exists pnpm && [[ -f "$DOTFILES/packages/pnpm-globals.txt" ]]; then
     info "Running pnpm setup..."
     pnpm setup &>/dev/null
   fi
+  PNPM_LIST_READY=true
+  PNPM_INSTALLED_FILE="$(mktemp)"
+  if ! pnpm ls -g --depth=-1 --json 2>/dev/null | python3 -c '
+import json, sys
+data = json.load(sys.stdin)
+deps = {}
+if isinstance(data, dict):
+    deps.update(data.get("dependencies", {}))
+elif isinstance(data, list):
+    for item in data:
+        if isinstance(item, dict):
+            deps.update(item.get("dependencies", {}))
+for name in sorted(deps.keys()):
+    print(name)
+' > "$PNPM_INSTALLED_FILE"; then
+    PNPM_LIST_READY=false
+    warn "Could not read pnpm global package list; falling back to per-package checks"
+  fi
   while IFS= read -r pkg; do
-    [[ -z "$pkg" ]] && continue
-    if pnpm list -g "$pkg" &>/dev/null; then
+    [[ -z "$pkg" || "$pkg" == \#* ]] && continue
+    if [[ "$PNPM_LIST_READY" == true ]] && grep -Fxq "$pkg" "$PNPM_INSTALLED_FILE"; then
+      success "$pkg"
+    elif pnpm list -g "$pkg" &>/dev/null; then
       success "$pkg"
     else
       info "Installing $pkg..."
@@ -202,7 +238,7 @@ fi
 # ============================================================
 section "Dock"
 if command_exists dockutil; then
-  bash "$DOTFILES/scripts/dock-apply.sh" "$PROFILE"
+  bash "$DOTFILES/scripts/dock-apply.sh" "--$PROFILE"
 else
   warn "dockutil not found — install with: brew install dockutil"
 fi
@@ -233,6 +269,6 @@ if [[ "$PROFILE" == "work" ]] && ! docker info &>/dev/null; then
 fi
 
 warn "App Store sign-in required"
-info "Install apps from ~/dotfiles/packages/apps.md"
+info "Install apps from $DOTFILES/packages/apps.md"
 
 echo ""

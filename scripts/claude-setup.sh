@@ -1,93 +1,75 @@
 #!/bin/bash
 
 # Set up Claude Code configuration (settings, agents, statusline, etc.)
-# Usage: bash scripts/claude-setup.sh        # interactive, prompts for each step
-#        bash scripts/claude-setup.sh -y     # accept all defaults
+# Usage: bash scripts/claude-setup.sh
 
-set -e
+set -euo pipefail
 
-source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/common.sh"
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/fs.sh"
 CLAUDE_SRC="$DOTFILES/config/claude"
 CLAUDE_DEST="$HOME/.claude"
-AUTO_YES=false
-
-for arg in "$@"; do
-  case "$arg" in
-    -y|--yes) AUTO_YES=true ;;
-  esac
-done
-
-confirm() {
-  if [[ "$AUTO_YES" == true ]]; then
-    return 0
-  fi
-  local prompt="$1"
-  local reply
-  printf "%s [Y/n] " "$prompt"
-  read -r reply
-  [[ -z "$reply" || "$reply" =~ ^[Yy]$ ]]
-}
 
 LINKED=0
 CREATED=0
+REPLACED=0
 
 link_file() {
   local src="$1"
   local dest="$2"
   local name="$(basename "$dest")"
 
-  mkdir -p "$(dirname "$dest")"
-
-  if [[ -e "$dest" || -L "$dest" ]]; then
-    if [[ "$(readlink "$dest")" == "$src" ]]; then
-      ((LINKED++)) || true
+  # Check if this would override an existing non-symlinked file
+  if [[ -e "$dest" && ! -L "$dest" ]] || [[ -L "$dest" && "$(readlink "$dest")" != "$src" ]]; then
+    local reply
+    printf "  %s exists and differs — override? [y/N] " "$name"
+    read -r reply
+    if [[ ! "$reply" =~ ^[Yy]$ ]]; then
+      info "$name (skipped)"
       return
     fi
-    mv "$dest" "${dest}.bak"
-    warn "$name (backed up existing)"
   fi
 
-  ln -s "$src" "$dest"
-  success "$name"
-  ((CREATED++)) || true
+  symlink_with_backup "$src" "$dest"
+  case "$SYMLINK_RESULT" in
+    already_linked)
+      ((LINKED++)) || true
+      ;;
+    replaced)
+      warn "$name (backed up existing → ${name}.bak)"
+      ((REPLACED++)) || true
+      ;;
+    created)
+      success "$name"
+      ((CREATED++)) || true
+      ;;
+  esac
 }
 
 section "Claude Code"
 
 # Settings
-if confirm "Link Claude settings.json?"; then
-  link_file "$CLAUDE_SRC/settings.json" "$CLAUDE_DEST/settings.json"
-fi
+link_file "$CLAUDE_SRC/settings.json" "$CLAUDE_DEST/settings.json"
 
 # CLAUDE.md
-if confirm "Link global CLAUDE.md?"; then
-  link_file "$CLAUDE_SRC/CLAUDE.md" "$CLAUDE_DEST/CLAUDE.md"
-fi
+link_file "$CLAUDE_SRC/CLAUDE.md" "$CLAUDE_DEST/CLAUDE.md"
 
 # Statusline
-if confirm "Link statusline-command.py?"; then
-  link_file "$CLAUDE_SRC/statusline-command.py" "$CLAUDE_DEST/statusline-command.py"
-fi
+link_file "$CLAUDE_SRC/statusline-command.py" "$CLAUDE_DEST/statusline-command.py"
 
 # Agents
-if confirm "Link custom agents?"; then
-  mkdir -p "$CLAUDE_DEST/agents"
-  for agent in "$CLAUDE_SRC/agents/"*.md; do
-    [[ -f "$agent" ]] || continue
-    name="$(basename "$agent")"
-    link_file "$agent" "$CLAUDE_DEST/agents/$name"
-  done
-fi
+mkdir -p "$CLAUDE_DEST/agents"
+for agent in "$CLAUDE_SRC/agents/"*.md; do
+  [[ -f "$agent" ]] || continue
+  link_file "$agent" "$CLAUDE_DEST/agents/$(basename "$agent")"
+done
 
 # Skills
-if confirm "Link skills directory?"; then
-  link_file "$CLAUDE_SRC/skills" "$CLAUDE_DEST/skills"
-fi
+link_file "$CLAUDE_SRC/skills" "$CLAUDE_DEST/skills"
 
 echo ""
-TOTAL=$((LINKED + CREATED))
-if [[ "$CREATED" -eq 0 ]]; then
+TOTAL=$((LINKED + CREATED + REPLACED))
+if [[ "$CREATED" -eq 0 && "$REPLACED" -eq 0 ]]; then
   printf "\033[32m✓\033[0m %d/%d up to date\n" "$TOTAL" "$TOTAL"
 else
-  printf "\033[32m✓\033[0m %d created, %d already linked\n" "$CREATED" "$LINKED"
+  printf "\033[32m✓\033[0m %d created, %d replaced, %d already linked\n" "$CREATED" "$REPLACED" "$LINKED"
 fi

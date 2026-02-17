@@ -5,39 +5,44 @@ Personal dotfiles with profile support for **work** and **personal** machines.
 ## Quick start
 
 ```sh
-git clone <repo> ~/dotfiles
-cd ~/dotfiles
-./setup.sh --work             # or: dots init --work
+git clone <repo> ~/dotfiles && cd ~/dotfiles
+./setup.sh
 ```
 
 The `dots` CLI is available after setup:
 
 ```sh
-dots setup | init [--work|--personal]   # full system setup
-dots save | update                      # save current state
-dots run <script> [args]                # run individual setup script
+dots setup [--work|--personal]          # full system setup
+dots save                               # save current state
+dots run <script> [--work|--personal]   # run individual script
+dots help                               # show help
 ```
 
-Available scripts via `dots run`:
+Scripts that accept `--work`/`--personal`:
 
 ```sh
-dots run brew [profile]          # install Homebrew packages
-dots run symlinks [profile]      # create config symlinks
-dots run dock [profile]          # apply Dock layout
-dots run claude [-y]             # setup Claude Code (interactive)
+dots run brew                    # install Homebrew packages
+dots run symlinks                # create config symlinks
+dots run dock --work             # apply Dock layout
+```
+
+Scripts with no profile:
+
+```sh
+dots run claude                  # setup Claude Code configs
 dots run macos                   # apply macOS system defaults
 dots run curl                    # install curl-based tools
 ```
 
-Scripts read profile from `~/.dotfiles-profile` when not specified.
+Profile is resolved in order: flag → `~/.dotfiles-profile` → prompt.
 
 ## Profiles
 
-| Flag           | Description                              |
-| -------------- | ---------------------------------------- |
-| `--work`       | Work Brewfile, work SSH config, mise tools |
-| `--personal`   | Personal Brewfile, personal SSH config   |
-| _(no flag)_    | Prompts to choose (reads `~/.dotfiles-profile` if set) |
+| Flag         | Description                                            |
+| ------------ | ------------------------------------------------------ |
+| `--work`     | Work Brewfile, work SSH config, mise tools             |
+| `--personal` | Personal Brewfile, personal SSH config                 |
+| _(no flag)_  | Prompts to choose (reads `~/.dotfiles-profile` if set) |
 
 ## Save current state
 
@@ -47,34 +52,34 @@ dots save
 
 Snapshots the current machine state into the repo, then prompts to commit and push.
 
-| # | Step                  | Output                             |
-|---| --------------------- | ---------------------------------- |
-| 1 | Read profile          | from `~/.dotfiles-profile`         |
-| 2 | Dump brew packages    | `packages/brew/<profile>/Brewfile` |
-| 3 | Dump Dock pinned apps | `packages/dock/<profile>.txt`      |
-| 4 | Dump npm globals      | `packages/npm-globals.txt`         |
-| 5 | Dump pnpm globals     | `packages/pnpm-globals.txt`        |
-| 6 | Git commit + push     | prompts y/N                        |
+| #   | Step                  | Output                             |
+| --- | --------------------- | ---------------------------------- |
+| 1   | Read profile          | from `~/.dotfiles-profile`         |
+| 2   | Dump brew packages    | `packages/brew/<profile>/Brewfile` |
+| 3   | Dump Dock pinned apps | `packages/dock/<profile>.txt`      |
+| 4   | Dump npm globals      | `packages/npm-globals.txt`         |
+| 5   | Dump pnpm globals     | `packages/pnpm-globals.txt`        |
+| 6   | Git commit + push     | prompts y/N                        |
 
 ## Setup flow
 
 `dots setup` runs these steps in order:
 
-| #  | Step                 | Standalone command      | Notes                             |
-| -- | -------------------- | ------------------- | --------------------------------- |
-| 1  | Xcode CLI Tools      |                     |                                   |
-| 2  | Homebrew             |                     |                                   |
-| 3  | Zinit                |                     |                                   |
-| 4  | Profile detection    |                     | prompts if no `--work`/`--personal` |
-| 5  | Brew packages        | `dots run brew`         |                                   |
-| 6  | Configs              | `dots run symlinks`     | shell, git, ssh, claude, editors, opencode |
-| 7  | Node (via n)         |                         |                                   |
-| 8  | npm globals          |                         |                                   |
-| 9  | pnpm globals         |                         |                                   |
-| 10 | Curl-installed tools | `dots run curl`         |                                   |
-| 11 | mise                 |                         | work profile only                 |
-| 12 | macOS defaults       | `dots run macos`        |                                   |
-| 13 | Dock layout          | `dots run dock`         |                                   |
+| #   | Step              | Standalone          | Notes                               |
+| --- | ----------------- | ------------------- | ----------------------------------- |
+| 1   | Xcode CLI Tools   |                     |                                     |
+| 2   | Homebrew          |                     |                                     |
+| 3   | Zinit             |                     |                                     |
+| 4   | Profile detection |                     | prompts if no `--work`/`--personal` |
+| 5   | Brew packages     | `dots run brew`     |                                     |
+| 6   | Symlinks          | `dots run symlinks` | shell, git, ssh, claude, editors    |
+| 7   | Node (via n)      |                     |                                     |
+| 8   | npm globals       |                     |                                     |
+| 9   | pnpm globals      |                     |                                     |
+| 10  | Curl tools        | `dots run curl`     |                                     |
+| 11  | mise              |                     | work profile only                   |
+| 12  | macOS defaults    | `dots run macos`    |                                     |
+| 13  | Dock layout       | `dots run dock`     |                                     |
 
 ## Structure
 
@@ -119,6 +124,6 @@ Dock layouts are plain text files with one app path per line.
 
 ```sh
 dots run dock                        # apply layout (uses saved profile)
-dots run dock work                   # or specify profile explicitly
+dots run dock --work                 # or specify profile explicitly
 micro packages/dock/work.txt         # edit manually
 ```

@@ -1,14 +1,14 @@
 #!/bin/bash
 # Apply a Dock configuration from a text file.
-# Usage: bash scripts/dock-apply.sh [profile]
-# Example: bash scripts/dock-apply.sh work
+# Usage: bash scripts/dock-apply.sh [--work|--personal]
+# Example: bash scripts/dock-apply.sh --work
 
 set -euo pipefail
 
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/common.sh"
 
 # Resolve profile
-PROFILE="$(require_profile "$(basename "$0")" "${1:-}")"
+PROFILE="$(require_profile "$@")"
 
 DOCK_FILE="$DOTFILES/packages/dock/${PROFILE}.txt"
 
@@ -22,27 +22,36 @@ if ! command -v dockutil &>/dev/null; then
   exit 1
 fi
 
+# Build desired app list (skip empty lines and comments)
+DESIRED=""
+while IFS= read -r app || [[ -n "$app" ]]; do
+  [[ -z "$app" || "$app" == \#* ]] && continue
+  DESIRED+="$app"$'\n'
+done < "$DOCK_FILE"
+DESIRED="${DESIRED%$'\n'}"
+
+# Get current persistent dock apps (order-preserving)
+CURRENT=$(dockutil --list 2>/dev/null \
+  | awk -F'\t' '{print $2}' \
+  | python3 -c "import sys, urllib.parse; [print(urllib.parse.unquote(l.strip().removeprefix('file://').rstrip('/'))) for l in sys.stdin]")
+
+# Compare — skip if already correct (same apps, same order)
+if [[ "$CURRENT" == "$DESIRED" ]]; then
+  success "Dock already configured ($(echo "$DESIRED" | wc -l | tr -d ' ') apps)"
+  exit 0
+fi
+
 # Disable "Show suggested and recent apps in Dock" to prevent re-injection
 defaults write com.apple.dock show-recents -bool false 2>/dev/null || true
 
-info "Clearing current dock..."
-
-# Remove all via dockutil
-dockutil --remove all --no-restart &>/dev/null || true
-
-# Belt & suspenders: force all dock arrays empty via defaults
+# Clear the dock: use defaults write to empty the arrays, then let
+# dockutil add on top. Do NOT kill cfprefsd here — that causes a race
+# where the Dock process writes running apps back into the plist.
+info "Applying dock layout..."
 defaults write com.apple.dock persistent-apps -array
 defaults write com.apple.dock persistent-others -array
 defaults write com.apple.dock recent-apps -array 2>/dev/null || true
 
-# CRITICAL: flush the preferences cache NOW, before any adds.
-# Without this, dockutil reads stale cached data and merges old items back in.
-killall cfprefsd 2>/dev/null || true
-
-success "Cleared"
-echo ""
-
-info "Adding apps..."
 ADDED=0
 SKIPPED=0
 

@@ -3,7 +3,7 @@
 # Install curl-based tools (bun, deno, claude, etc.)
 # Usage: bash scripts/curl-tools.sh
 
-set -e
+set -euo pipefail
 
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/common.sh"
 
