@@ -1,7 +1,6 @@
 #!/bin/bash
 
 DOTFILES="$HOME/dotfiles"
-BREW_AUTOUPDATE_INTERVAL=86400  # 24 hours in seconds
 
 # ============================================================
 # Helpers
@@ -12,18 +11,6 @@ warn()    { printf "\033[33m!\033[0m %s\n" "$1"; }
 step()    { printf "\n\033[1;35m%s\033[0m\n" "$1"; }
 
 command_exists() { command -v "$1" &>/dev/null; }
-
-install_tool() {
-  local cmd="$1"
-  local install_cmd="$2"
-  if command_exists "$cmd"; then
-    success "$cmd already installed"
-  else
-    info "Installing $cmd..."
-    eval "$install_cmd"
-    success "$cmd installed (available in new terminal)"
-  fi
-}
 
 # ============================================================
 # Parse flags
@@ -102,61 +89,13 @@ echo "$PROFILE" > "$HOME/.dotfiles-profile"
 # 5. Brew bundle
 # ============================================================
 step "5. Brew packages"
-BREWFILE="$DOTFILES/packages/brew/$PROFILE/Brewfile"
-if [[ ! -f "$BREWFILE" ]]; then
-  warn "No Brewfile found at $BREWFILE — skipping"
-else
-  info "Installing from $BREWFILE..."
-  brew bundle --file="$BREWFILE" || warn "Some packages may have failed — check output above"
-  success "Done"
-fi
-
-# Configure brew autoupdate (every 24h)
-if command_exists brew; then
-  info "Configuring brew autoupdate (every 24h)..."
-  # Stop existing autoupdate if running
-  brew autoupdate stop 2>/dev/null || true
-  # Start: upgrade + cleanup every 24h (86400 seconds)
-  brew autoupdate start "$BREW_AUTOUPDATE_INTERVAL" --upgrade --cleanup --immediate
-  success "Brew autoupdate configured"
-fi
+bash "$DOTFILES/scripts/brew-install.sh" "$PROFILE"
 
 # ============================================================
 # 6. Symlinks
 # ============================================================
 step "6. Symlinks"
-
-link_file() {
-  local src="$1"
-  local dest="$2"
-
-  mkdir -p "$(dirname "$dest")"
-
-  if [[ -e "$dest" || -L "$dest" ]]; then
-    if [[ "$(readlink "$dest")" == "$src" ]]; then
-      success "Already linked: $dest"
-      return
-    fi
-    mv "$dest" "${dest}.bak"
-    warn "Backed up: $dest → ${dest}.bak"
-  fi
-
-  ln -s "$src" "$dest"
-  success "Linked: $dest → $src"
-}
-
-link_file "$DOTFILES/config/shell/.zshrc"          "$HOME/.zshrc"
-link_file "$DOTFILES/config/shell/omz-aliases"     "$HOME/.local/share/zinit/plugins/omz-aliases"
-link_file "$DOTFILES/config/starship.toml"         "$HOME/.config/starship.toml"
-link_file "$DOTFILES/config/ghostty/config"        "$HOME/.config/ghostty/config"
-link_file "$DOTFILES/config/ghostty/config"        "$HOME/Library/Application Support/com.mitchellh.ghostty/config"
-link_file "$DOTFILES/config/micro/settings.json"   "$HOME/.config/micro/settings.json"
-link_file "$DOTFILES/config/micro/bindings.json"   "$HOME/.config/micro/bindings.json"
-link_file "$DOTFILES/config/gh/config.yml"         "$HOME/.config/gh/config.yml"
-link_file "$DOTFILES/config/gh-dash/config.yml"    "$HOME/.config/gh-dash/config.yml"
-link_file "$DOTFILES/config/git/.gitconfig"        "$HOME/.gitconfig"
-link_file "$DOTFILES/config/git/ignore"            "$HOME/.config/git/ignore"
-link_file "$DOTFILES/config/ssh/config.$PROFILE"   "$HOME/.ssh/config"
+bash "$DOTFILES/scripts/symlinks.sh" "$PROFILE"
 
 # ============================================================
 # 7. Node (n)
@@ -219,7 +158,7 @@ fi
 # 10. Curl-installed tools (self-updating)
 # ============================================================
 step "10. Curl-installed tools"
-source "$DOTFILES/packages/curl-tools.sh"
+bash "$DOTFILES/scripts/curl-tools.sh"
 
 # ============================================================
 # 11. mise (work profile only)
@@ -250,9 +189,9 @@ fi
 # ============================================================
 if [[ "$APPLY_MACOS" == true ]]; then
   step "13. macOS defaults"
-  if [[ -f "$DOTFILES/scripts/macos.sh" ]]; then
+  if [[ -f "$DOTFILES/scripts/macos-defaults.sh" ]]; then
     info "Applying macOS defaults..."
-    bash "$DOTFILES/scripts/macos.sh"
+    bash "$DOTFILES/scripts/macos-defaults.sh"
     success "Done — some changes require a restart"
   else
     warn "macos.sh not found"

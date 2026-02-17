@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # macOS defaults
-# Run: ./setup.sh --macos (or directly: bash scripts/macos.sh)
+# Run: ./setup.sh --macos (or directly: bash scripts/macos-defaults.sh)
 # Some changes require a logout/restart to take effect.
 
 DOTFILES="$(cd "$(dirname "$0")/.." && pwd)"

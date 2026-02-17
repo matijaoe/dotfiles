@@ -27,16 +27,26 @@ Dumps Homebrew packages, Dock layout, npm globals, and pnpm globals for the acti
 | `config/git/`                      | Git config and global ignore               |
 | `config/shell/.zshrc`              | Zsh config with Zinit                      |
 | `config/ssh/`                      | SSH config per profile                     |
+| `config/claude/`                   | Claude Code settings, agents, skills       |
 | `packages/brew/<profile>/Brewfile` | Homebrew packages per profile              |
 | `packages/dock/<profile>.txt`      | Pinned Dock apps per profile               |
 | `packages/npm-globals.txt`         | Global npm packages                        |
 | `packages/pnpm-globals.txt`        | Global pnpm packages                       |
 | `packages/curl-tools.sh`           | Tools installed via curl (bun, deno, etc.) |
 | `packages/apps.md`                 | Apps installed outside Homebrew            |
-| `config/claude/`                   | Claude Code settings, agents, skills       |
-| `scripts/claude-setup.sh`         | Claude Code setup (standalone or via setup) |
-| `scripts/macos.sh`                 | macOS system defaults                      |
-| `scripts/dock-apply.sh`            | Apply a Dock config standalone             |
+
+## Standalone scripts
+
+Each can run independently or is called by `setup.sh`:
+
+```bash
+bash scripts/brew-install.sh [profile]     # install Brewfile + autoupdate
+bash scripts/symlinks.sh [profile]         # create all config symlinks
+bash scripts/curl-tools.sh                 # install curl-based tools
+bash scripts/claude-setup.sh               # link Claude Code configs (interactive)
+bash scripts/macos-defaults.sh             # apply macOS system defaults + dock
+bash scripts/dock-apply.sh <profile>       # apply dock layout
+```
 
 ## Dock management
 
