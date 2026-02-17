@@ -1,0 +1,1 @@
+- NEVER commit automatically without explicit approval.

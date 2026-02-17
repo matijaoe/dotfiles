@@ -236,10 +236,20 @@ else
 fi
 
 # ============================================================
-# 12. macOS defaults
+# 12. Claude Code
+# ============================================================
+step "12. Claude Code"
+if [[ -f "$DOTFILES/scripts/claude-setup.sh" ]]; then
+  bash "$DOTFILES/scripts/claude-setup.sh" -y
+else
+  warn "scripts/claude-setup.sh not found"
+fi
+
+# ============================================================
+# 13. macOS defaults
 # ============================================================
 if [[ "$APPLY_MACOS" == true ]]; then
-  step "12. macOS defaults"
+  step "13. macOS defaults"
   if [[ -f "$DOTFILES/scripts/macos.sh" ]]; then
     info "Applying macOS defaults..."
     bash "$DOTFILES/scripts/macos.sh"
@@ -248,13 +258,13 @@ if [[ "$APPLY_MACOS" == true ]]; then
     warn "macos.sh not found"
   fi
 else
-  step "12. macOS defaults (skipped — use --macos to apply)"
+  step "13. macOS defaults (skipped — use --macos to apply)"
 fi
 
 # ============================================================
-# 13. Dock apps
+# 14. Dock apps
 # ============================================================
-step "13. Dock apps"
+step "14. Dock apps"
 DOCK_FILE="$DOTFILES/packages/dock/${PROFILE}.txt"
 if [[ -f "$DOCK_FILE" ]]; then
   if command_exists dockutil; then

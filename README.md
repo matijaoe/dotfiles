@@ -33,6 +33,8 @@ Dumps Homebrew packages, Dock layout, npm globals, and pnpm globals for the acti
 | `packages/pnpm-globals.txt`        | Global pnpm packages                       |
 | `packages/curl-tools.sh`           | Tools installed via curl (bun, deno, etc.) |
 | `packages/apps.md`                 | Apps installed outside Homebrew            |
+| `config/claude/`                   | Claude Code settings, agents, skills       |
+| `scripts/claude-setup.sh`         | Claude Code setup (standalone or via setup) |
 | `scripts/macos.sh`                 | macOS system defaults                      |
 | `scripts/dock-apply.sh`            | Apply a Dock config standalone             |
 
