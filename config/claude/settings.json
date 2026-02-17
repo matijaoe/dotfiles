@@ -201,6 +201,7 @@
     ],
     "defaultMode": "acceptEdits"
   },
+  "model": "sonnet[1m]",
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "context7"
@@ -265,6 +266,5 @@
   },
   "alwaysThinkingEnabled": true,
   "autoUpdatesChannel": "latest",
-  "showTurnDuration": true,
-  "effortLevel": "medium"
+  "showTurnDuration": true
 }

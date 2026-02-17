@@ -8,25 +8,42 @@ Personal dotfiles with profile support for **work** and **personal** machines.
 git clone <repo> ~/dotfiles
 cd ~/dotfiles
 ./setup.sh                    # prompts to pick: work / personal
-./setup.sh --work             # skip prompt
-./setup.sh --work --macos     # also apply macOS system defaults
+./setup.sh --work             # skip prompt, use work profile
 ```
 
-### Profiles
+After setup, the `dots` CLI is available globally:
+
+```sh
+dots setup [--work|--personal]   # full system setup
+dots save                        # save current state
+dots run <script> [args]         # run individual setup script
+```
+
+Available scripts via `dots run`:
+
+```sh
+dots run brew [profile]          # install Homebrew packages
+dots run symlinks [profile]      # create config symlinks
+dots run dock <profile>          # apply Dock layout
+dots run claude [-y]             # setup Claude Code configs
+dots run macos                   # apply macOS system defaults
+dots run curl                    # install curl-based tools
+```
+
+Scripts read profile from `~/.dotfiles-profile` when not specified.
+
+## Profiles
 
 | Flag           | Description                              |
 | -------------- | ---------------------------------------- |
 | `--work`       | Work Brewfile, work SSH config, mise tools |
 | `--personal`   | Personal Brewfile, personal SSH config   |
 | _(no flag)_    | Prompts to choose (reads `~/.dotfiles-profile` if set) |
-| `--macos`      | Apply macOS system defaults (optional, any profile) |
-
-The chosen profile is saved to `~/.dotfiles-profile` and reused by `save.sh` and standalone scripts.
 
 ## Save current state
 
 ```sh
-./save.sh    # or: save (zsh alias)
+dots save
 ```
 
 Snapshots the current machine state into the repo, then prompts to commit and push.
@@ -42,54 +59,54 @@ Snapshots the current machine state into the repo, then prompts to commit and pu
 
 ## Setup flow
 
-`setup.sh` runs these steps in order. Steps with a link can also be run standalone.
+`dots setup` runs these steps in order:
 
-| #  | Step                 | Standalone script                                         | Notes                             |
-| -- | -------------------- | --------------------------------------------------------- | --------------------------------- |
-| 1  | Xcode CLI Tools      |                                                           |                                   |
-| 2  | Homebrew             |                                                           |                                   |
-| 3  | Zinit                |                                                           |                                   |
-| 4  | Profile detection    |                                                           | prompts if no flag passed         |
-| 5  | Brew packages        | [`brew-install.sh`](scripts/brew-install.sh) `[profile]`  |                                   |
-| 6  | Symlinks             | [`symlinks.sh`](scripts/symlinks.sh) `[profile]`          |                                   |
-| 7  | Node (via n)         |                                                           |                                   |
-| 8  | npm globals          |                                                           |                                   |
-| 9  | pnpm globals         |                                                           |                                   |
-| 10 | Curl-installed tools | [`curl-tools.sh`](scripts/curl-tools.sh)                  |                                   |
-| 11 | mise                 |                                                           | work profile only                 |
-| 12 | Claude Code          | [`claude-setup.sh`](scripts/claude-setup.sh) `[-y]`       | interactive, `-y` skips prompts   |
-| 13 | macOS defaults       | [`macos-defaults.sh`](scripts/macos-defaults.sh)          | only runs with `--macos` flag     |
-| 14 | Dock layout          | [`dock-apply.sh`](scripts/dock-apply.sh) `<profile>`      |                                   |
-
-Standalone scripts read profile from `~/.dotfiles-profile` when no argument is given.
+| #  | Step                 | Standalone command      | Notes                             |
+| -- | -------------------- | ------------------- | --------------------------------- |
+| 1  | Xcode CLI Tools      |                     |                                   |
+| 2  | Homebrew             |                     |                                   |
+| 3  | Zinit                |                     |                                   |
+| 4  | Profile detection    |                     | prompts if no `--work`/`--personal` |
+| 5  | Brew packages        | `dots run brew`         |                                   |
+| 6  | Symlinks             | `dots run symlinks`     |                                   |
+| 7  | Node (via n)         |                         |                                   |
+| 8  | npm globals          |                         |                                   |
+| 9  | pnpm globals         |                         |                                   |
+| 10 | Curl-installed tools | `dots run curl`         |                                   |
+| 11 | mise                 |                         | work profile only                 |
+| 12 | Claude Code          | `dots run claude [-y]`  | `-y` skips prompts                |
+| 13 | macOS defaults       | `dots run macos`        |                                   |
+| 14 | Dock layout          | `dots run dock`         |                                   |
 
 ## Structure
 
 ```
 dotfiles/
-├── setup.sh                          # full setup entry point
-├── save.sh                           # save state entry point
+├── dots                              # CLI entry point (symlinked to ~/.local/bin/dots)
+├── setup.sh                          # full setup (called by: dots setup)
+├── save.sh                           # save state (called by: dots save)
 │
 ├── config/                           # all app configs
-│   ├── claude/                       # Claude Code (settings, agents, skills)
-│   ├── gh/                           # GitHub CLI
-│   ├── gh-dash/                      # GitHub dashboard
-│   ├── ghostty/                      # terminal emulator
-│   ├── git/                          # .gitconfig + global ignore
-│   ├── micro/                        # text editor
-│   ├── shell/                        # .zshrc + aliases + CLI reference
-│   ├── ssh/                          # SSH config per profile
-│   └── starship.toml                 # prompt theme
+│   ├── claude/                       # Claude Code (settings, agents, skills) → ~/.claude/
+│   ├── gh/                           # GitHub CLI → ~/.config/gh/
+│   ├── gh-dash/                      # GitHub dashboard → ~/.config/gh-dash/
+│   ├── ghostty/                      # terminal emulator → ~/.config/ghostty/
+│   ├── git/                          # .gitconfig + global ignore → ~/
+│   ├── micro/                        # text editor → ~/.config/micro/
+│   ├── opencode/                     # OpenCode settings → ~/.config/opencode/ & ~/.opencode.json
+│   ├── shell/                        # .zshrc + aliases + CLI reference → ~/
+│   ├── ssh/                          # SSH config per profile → ~/.ssh/config
+│   └── starship.toml                 # prompt theme → ~/.config/starship.toml
 │
 ├── packages/                         # all package definitions
 │   ├── brew/<profile>/Brewfile       # Homebrew packages
 │   ├── dock/<profile>.txt            # Dock pinned apps
 │   ├── npm-globals.txt               # global npm packages
 │   ├── pnpm-globals.txt              # global pnpm packages
-│   ├── curl-tools.sh                 # tools installed via curl
-│   └── apps.md                       # apps installed outside Homebrew
+│   ├── curl-tools.sh                 # tools installed via curl (bun, deno, etc.)
+│   └── apps.md                       # apps installed outside Homebrew (App Store)
 │
-└── scripts/                          # standalone runnable scripts
+└── scripts/                          # standalone scripts (called by dots CLI)
     ├── brew-install.sh
     ├── claude-setup.sh
     ├── curl-tools.sh
@@ -100,9 +117,9 @@ dotfiles/
 
 ## Dock management
 
-Dock layouts are plain text files with one app path per line. `save.sh` dumps the current layout, `setup.sh` applies it. Missing apps are skipped.
+Dock layouts are plain text files with one app path per line.
 
 ```sh
-./scripts/dock-apply.sh work          # apply standalone
-micro packages/dock/work.txt          # edit manually
+dots run dock work                   # apply work layout
+micro packages/dock/work.txt         # edit manually
 ```

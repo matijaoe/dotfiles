@@ -1,0 +1,34 @@
+#compdef dots
+
+_dots() {
+  local -a commands
+  commands=(
+    'setup:Full system setup (new Mac bootstrap)'
+    'save:Save current state to repo'
+    'run:Run individual setup script'
+  )
+
+  local -a scripts
+  scripts=(
+    'brew:Install Homebrew packages'
+    'symlinks:Create config symlinks'
+    'dock:Apply Dock layout'
+    'claude:Setup Claude Code configs'
+    'macos:Apply macOS system defaults'
+    'curl:Install curl-based tools'
+  )
+
+  if ((CURRENT == 2)); then
+    _describe 'command' commands
+  elif ((CURRENT == 3)) && [[ "${words[2]}" == "run" ]]; then
+    _describe 'script' scripts
+  elif ((CURRENT == 3)) && [[ "${words[2]}" == "setup" ]]; then
+    _arguments \
+      '--work[Use work profile]' \
+      '--personal[Use personal profile]'
+  elif ((CURRENT == 4)) && [[ "${words[2]}" == "run" && "${words[3]}" == "claude" ]]; then
+    _arguments '-y[Skip prompts]'
+  fi
+}
+
+_dots "$@"

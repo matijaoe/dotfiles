@@ -170,15 +170,3 @@ for app in "Activity Monitor" "cfprefsd" "Dock" "Finder" "Safari" "SystemUIServe
 done
 
 echo "macOS defaults applied. Some changes require a logout/restart."
-
-###############################################################################
-# Dock layout                                                                 #
-###############################################################################
-
-if [[ -f "$HOME/.dotfiles-profile" ]]; then
-  PROFILE=$(cat "$HOME/.dotfiles-profile")
-  if [[ -f "$DOTFILES/scripts/dock-apply.sh" ]]; then
-    echo "Applying Dock layout for $PROFILE..."
-    bash "$DOTFILES/scripts/dock-apply.sh" "$PROFILE"
-  fi
-fi

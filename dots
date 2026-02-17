@@ -1,0 +1,110 @@
+#!/bin/bash
+
+# Dotfiles CLI — unified interface for all dotfiles operations
+# Usage: dots <command> [args]
+
+set -e
+
+# Resolve real path even when called through symlink
+SCRIPT_PATH="$0"
+if [[ -L "$SCRIPT_PATH" ]]; then
+  SCRIPT_PATH="$(readlink "$SCRIPT_PATH")"
+fi
+DOTFILES="$(cd "$(dirname "$SCRIPT_PATH")" && pwd)"
+
+# ============================================================
+# Helpers
+# ============================================================
+info()    { printf "\033[34m→\033[0m %s\n" "$1"; }
+error()   { printf "\033[31m✗\033[0m %s\n" "$1"; }
+
+show_help() {
+  cat <<EOF
+dots — dotfiles management CLI
+
+Usage: dots <command> [args]
+
+Main commands:
+  setup [--work|--personal]   Full system setup (new Mac bootstrap)
+  save                        Save current state to repo
+  run <script> [args]         Run individual setup script
+
+Available scripts (dots run <script>):
+  brew [profile]              Install Homebrew packages
+  symlinks [profile]          Create config symlinks
+  dock <profile>              Apply Dock layout
+  claude [-y]                 Setup Claude Code configs
+  macos                       Apply macOS system defaults
+  curl                        Install curl-based tools
+
+Examples:
+  dots setup --work           # bootstrap new work Mac
+  dots save                   # snapshot current state
+  dots run brew               # re-run brew install (uses saved profile)
+  dots run dock work          # apply work dock layout
+  dots run claude             # setup Claude (interactive prompts)
+
+Note: Scripts read profile from ~/.dotfiles-profile when not specified.
+EOF
+}
+
+# ============================================================
+# Command dispatcher
+# ============================================================
+COMMAND="${1:-}"
+shift || true
+
+case "$COMMAND" in
+  setup)
+    exec "$DOTFILES/setup.sh" "$@"
+    ;;
+  save)
+    exec "$DOTFILES/save.sh" "$@"
+    ;;
+  run)
+    SCRIPT="${1:-}"
+    shift || true
+    case "$SCRIPT" in
+      brew)
+        exec "$DOTFILES/scripts/brew-install.sh" "$@"
+        ;;
+      symlinks)
+        exec "$DOTFILES/scripts/symlinks.sh" "$@"
+        ;;
+      dock)
+        exec "$DOTFILES/scripts/dock-apply.sh" "$@"
+        ;;
+      claude)
+        exec "$DOTFILES/scripts/claude-setup.sh" "$@"
+        ;;
+      macos)
+        exec "$DOTFILES/scripts/macos-defaults.sh" "$@"
+        ;;
+      curl)
+        exec "$DOTFILES/scripts/curl-tools.sh" "$@"
+        ;;
+      "")
+        error "Missing script name"
+        echo ""
+        show_help
+        exit 1
+        ;;
+      *)
+        error "Unknown script: $SCRIPT"
+        echo ""
+        show_help
+        exit 1
+        ;;
+    esac
+    ;;
+  help|--help|-h|"")
+    show_help
+    exit 0
+    ;;
+  *)
+    error "Unknown command: $COMMAND"
+    echo ""
+    show_help
+    exit 1
+    ;;
+esac

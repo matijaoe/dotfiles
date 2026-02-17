@@ -31,12 +31,27 @@ if [[ ! -f "$BREWFILE" ]]; then
   exit 1
 fi
 
-info "Installing from $BREWFILE..."
-brew bundle --file="$BREWFILE" || warn "Some packages may have failed — check output above"
-success "Done"
+info "Installing from Brewfile ($PROFILE)..."
+
+_brew_tmp=$(mktemp)
+brew bundle --file="$BREWFILE" > "$_brew_tmp" 2>&1 || true
+
+# Show only installs and upgrades
+grep -E "^(Installing|Upgrading)" "$_brew_tmp" || true
+
+USING=$(grep -cE "^Using " "$_brew_tmp" || true)
+INSTALLING=$(grep -cE "^Installing " "$_brew_tmp" || true)
+UPGRADING=$(grep -cE "^Upgrading " "$_brew_tmp" || true)
+rm -f "$_brew_tmp"
+
+if [[ "$INSTALLING" -eq 0 && "$UPGRADING" -eq 0 ]]; then
+  success "$USING packages up to date"
+else
+  success "$INSTALLING installed, $UPGRADING upgraded, $USING already up to date"
+fi
 
 # Configure autoupdate
-info "Configuring brew autoupdate (every 24h)..."
-brew autoupdate stop 2>/dev/null || true
-brew autoupdate start "$BREW_AUTOUPDATE_INTERVAL" --upgrade --cleanup --immediate
-success "Brew autoupdate configured"
+info "Configuring brew autoupdate..."
+brew autoupdate stop &>/dev/null || true
+brew autoupdate start "$BREW_AUTOUPDATE_INTERVAL" --upgrade --cleanup --immediate &>/dev/null
+success "Brew autoupdate configured (every 24h)"

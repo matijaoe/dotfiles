@@ -5,10 +5,10 @@ DOTFILES="$HOME/dotfiles"
 # ============================================================
 # Helpers
 # ============================================================
-info()    { printf "\033[34m→\033[0m %s\n" "$1"; }
-success() { printf "\033[32m✓\033[0m %s\n" "$1"; }
-warn()    { printf "\033[33m!\033[0m %s\n" "$1"; }
-step()    { printf "\n\033[1;35m%s\033[0m\n" "$1"; }
+info()    { printf "  \033[34m•\033[0m %s\n" "$1"; }
+success() { printf "  \033[32m✓\033[0m %s\n" "$1"; }
+warn()    { printf "  \033[33m!\033[0m %s\n" "$1"; }
+section() { printf "\n\033[1;36m➤\033[0m %s\n" "$1"; }
 
 command_exists() { command -v "$1" &>/dev/null; }
 
@@ -30,7 +30,7 @@ done
 # ============================================================
 # 1. Xcode Command Line Tools
 # ============================================================
-step "1. Xcode Command Line Tools"
+section "Xcode Command Line Tools"
 if xcode-select -p &>/dev/null; then
   success "Already installed"
 else
@@ -43,7 +43,7 @@ fi
 # ============================================================
 # 2. Homebrew
 # ============================================================
-step "2. Homebrew"
+section "Homebrew"
 if command_exists brew; then
   success "Already installed"
 else
@@ -56,7 +56,7 @@ eval "$(/opt/homebrew/bin/brew shellenv)"
 # ============================================================
 # 3. Zinit
 # ============================================================
-step "3. Zinit"
+section "Zinit"
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
 if [[ -d "$ZINIT_HOME" ]]; then
   success "Already installed"
@@ -70,7 +70,7 @@ fi
 # ============================================================
 # 4. Detect profile
 # ============================================================
-step "4. Profile"
+section "Profile"
 if [[ -z "$PROFILE" ]]; then
   if [[ -f "$HOME/.dotfiles-profile" ]]; then
     PROFILE=$(cat "$HOME/.dotfiles-profile")
@@ -88,19 +88,19 @@ echo "$PROFILE" > "$HOME/.dotfiles-profile"
 # ============================================================
 # 5. Brew bundle
 # ============================================================
-step "5. Brew packages"
+section "Brew packages"
 bash "$DOTFILES/scripts/brew-install.sh" "$PROFILE"
 
 # ============================================================
 # 6. Symlinks
 # ============================================================
-step "6. Symlinks"
+section "Symlinks"
 bash "$DOTFILES/scripts/symlinks.sh" "$PROFILE"
 
 # ============================================================
 # 7. Node (n)
 # ============================================================
-step "7. Node"
+section "Node"
 # n needs N_PREFIX set to install to ~/.n instead of /usr/local
 export N_PREFIX="$HOME/.n"
 export PATH="$N_PREFIX/bin:$PATH"
@@ -122,11 +122,17 @@ fi
 # ============================================================
 # 8. npm global packages
 # ============================================================
-step "8. npm globals"
+section "npm globals"
 if command_exists npm && [[ -f "$DOTFILES/packages/npm-globals.txt" ]]; then
-  info "Installing npm global packages..."
-  xargs npm install -g < "$DOTFILES/packages/npm-globals.txt"
-  success "Done"
+  while IFS= read -r pkg; do
+    [[ -z "$pkg" ]] && continue
+    if npm list -g "$pkg" --depth=0 &>/dev/null; then
+      success "$pkg"
+    else
+      info "Installing $pkg..."
+      npm install -g "$pkg" &>/dev/null && success "$pkg" || warn "$pkg (failed)"
+    fi
+  done < "$DOTFILES/packages/npm-globals.txt"
 elif ! command_exists npm; then
   warn "npm not found — install Node first"
 else
@@ -136,18 +142,24 @@ fi
 # ============================================================
 # 9. pnpm global packages
 # ============================================================
-step "9. pnpm globals"
+section "pnpm globals"
 if command_exists pnpm && [[ -f "$DOTFILES/packages/pnpm-globals.txt" ]]; then
   # Ensure PNPM_HOME is set up
   export PNPM_HOME="$HOME/Library/pnpm"
   export PATH="$PNPM_HOME:$PATH"
   if [[ ! -d "$PNPM_HOME" ]]; then
     info "Running pnpm setup..."
-    pnpm setup
+    pnpm setup &>/dev/null
   fi
-  info "Installing pnpm global packages..."
-  xargs pnpm install -g < "$DOTFILES/packages/pnpm-globals.txt"
-  success "Done"
+  while IFS= read -r pkg; do
+    [[ -z "$pkg" ]] && continue
+    if pnpm list -g "$pkg" &>/dev/null; then
+      success "$pkg"
+    else
+      info "Installing $pkg..."
+      pnpm install -g "$pkg" &>/dev/null && success "$pkg" || warn "$pkg (failed)"
+    fi
+  done < "$DOTFILES/packages/pnpm-globals.txt"
 elif ! command_exists pnpm; then
   warn "pnpm not found — skipping"
 else
@@ -157,17 +169,17 @@ fi
 # ============================================================
 # 10. Curl-installed tools (self-updating)
 # ============================================================
-step "10. Curl-installed tools"
+section "Curl-installed tools"
 bash "$DOTFILES/scripts/curl-tools.sh"
 
 # ============================================================
 # 11. mise (work profile only)
 # ============================================================
-step "11. mise"
+section "mise"
 if [[ "$PROFILE" == "work" ]] && command_exists mise; then
-  info "Installing work tools via mise..."
-  mise use --global awscli kubectl sops
-  success "Done"
+  info "Installing work tools..."
+  mise use --global awscli kubectl sops &>/dev/null
+  success "awscli, kubectl, sops"
 elif [[ "$PROFILE" == "work" ]]; then
   warn "mise not found — should be installed via brew in step 5"
 else
@@ -177,7 +189,7 @@ fi
 # ============================================================
 # 12. Claude Code
 # ============================================================
-step "12. Claude Code"
+section "Claude Code"
 if [[ -f "$DOTFILES/scripts/claude-setup.sh" ]]; then
   bash "$DOTFILES/scripts/claude-setup.sh" -y
 else
@@ -187,64 +199,50 @@ fi
 # ============================================================
 # 13. macOS defaults
 # ============================================================
-if [[ "$APPLY_MACOS" == true ]]; then
-  step "13. macOS defaults"
-  if [[ -f "$DOTFILES/scripts/macos-defaults.sh" ]]; then
-    info "Applying macOS defaults..."
-    bash "$DOTFILES/scripts/macos-defaults.sh"
-    success "Done — some changes require a restart"
-  else
-    warn "macos.sh not found"
-  fi
+section "macOS defaults"
+if [[ -f "$DOTFILES/scripts/macos-defaults.sh" ]]; then
+  bash "$DOTFILES/scripts/macos-defaults.sh" &>/dev/null
+  success "Applied — some changes require restart"
 else
-  step "13. macOS defaults (skipped — use --macos to apply)"
+  warn "scripts/macos-defaults.sh not found"
 fi
 
 # ============================================================
 # 14. Dock apps
 # ============================================================
-step "14. Dock apps"
-DOCK_FILE="$DOTFILES/packages/dock/${PROFILE}.txt"
-if [[ -f "$DOCK_FILE" ]]; then
-  if command_exists dockutil; then
-    info "Applying Dock layout for $PROFILE..."
-    bash "$DOTFILES/scripts/dock-apply.sh" "$PROFILE"
-    success "Done"
-  else
-    warn "dockutil not found — install with: brew install dockutil"
-  fi
+section "Dock"
+if command_exists dockutil; then
+  bash "$DOTFILES/scripts/dock-apply.sh" "$PROFILE"
 else
-  info "No Dock config for $PROFILE — skipping"
+  warn "dockutil not found — install with: brew install dockutil"
 fi
 
 # ============================================================
 # Summary
 # ============================================================
-step "Setup complete!"
 echo ""
+printf "\033[1;32m✓ Setup complete!\033[0m\n"
 
 # Post-setup checks
-MANUAL_STEPS=()
+section "Manual steps"
 
 if ! command_exists op || ! op account list &>/dev/null 2>&1; then
-  MANUAL_STEPS+=("Open 1Password → Settings → Developer → enable SSH Agent")
-  MANUAL_STEPS+=("Sign in to 1Password CLI: op signin")
+  warn "1Password SSH Agent not configured"
+  info "Open 1Password → Settings → Developer → enable SSH Agent"
+  info "Sign in to CLI: op signin"
 fi
 
 if [[ ! -f "$HOME/.ssh/key-github" ]]; then
-  MANUAL_STEPS+=("Set up SSH key: export from 1Password or generate new (~/.ssh/key-github)")
+  warn "SSH key not found"
+  info "Export from 1Password or generate new: ~/.ssh/key-github"
 fi
 
 if [[ "$PROFILE" == "work" ]] && ! docker info &>/dev/null; then
-  MANUAL_STEPS+=("Open OrbStack to complete Docker setup")
+  warn "Docker not running"
+  info "Open OrbStack to complete setup"
 fi
 
-MANUAL_STEPS+=("Sign in to App Store for manual app installs (see packages/apps.md)")
+warn "App Store sign-in required"
+info "Install apps from ~/dotfiles/packages/apps.md"
 
-if [[ ${#MANUAL_STEPS[@]} -gt 0 ]]; then
-  echo "Manual steps:"
-  for i in "${!MANUAL_STEPS[@]}"; do
-    echo "  $((i+1)). ${MANUAL_STEPS[$i]}"
-  done
-  echo ""
-fi
+echo ""
