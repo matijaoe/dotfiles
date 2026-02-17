@@ -54,5 +54,7 @@ link_file "$DOTFILES/config/gh-dash/config.yml"    "$HOME/.config/gh-dash/config
 link_file "$DOTFILES/config/git/.gitconfig"        "$HOME/.gitconfig"
 link_file "$DOTFILES/config/git/ignore"            "$HOME/.config/git/ignore"
 link_file "$DOTFILES/config/ssh/config.$PROFILE"   "$HOME/.ssh/config"
+link_file "$DOTFILES/config/opencode/opencode.json" "$HOME/.config/opencode/opencode.json"
+link_file "$DOTFILES/config/opencode/theme.json"    "$HOME/.opencode.json"
 
 success "All symlinks created"

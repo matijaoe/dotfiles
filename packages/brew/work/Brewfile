@@ -57,6 +57,8 @@ brew "lsusb"
 brew "micro"
 # Polyglot runtime manager (asdf rust clone)
 brew "mise"
+# Deep clean and optimize your Mac
+brew "mole"
 # Node version management
 brew "n"
 # NCurses Disk Usage
