@@ -6,21 +6,10 @@
 
 set -e
 
-DOTFILES="$(cd "$(dirname "$0")/.." && pwd)"
-
-success() { printf "  \033[32m✓\033[0m %s\n" "$1"; }
-warn()    { printf "  \033[33m!\033[0m %s\n" "$1"; }
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/common.sh"
 
 # Resolve profile
-PROFILE="${1:-}"
-if [[ -z "$PROFILE" && -f "$HOME/.dotfiles-profile" ]]; then
-  PROFILE=$(cat "$HOME/.dotfiles-profile")
-fi
-if [[ -z "$PROFILE" ]]; then
-  echo "Usage: symlinks.sh <profile>"
-  echo "Or set profile via: echo work > ~/.dotfiles-profile"
-  exit 1
-fi
+PROFILE="$(require_profile "$(basename "$0")" "${1:-}")"
 
 TOTAL=0
 CREATED=0

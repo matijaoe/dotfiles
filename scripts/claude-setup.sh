@@ -6,7 +6,7 @@
 
 set -e
 
-DOTFILES="$(cd "$(dirname "$0")/.." && pwd)"
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/common.sh"
 CLAUDE_SRC="$DOTFILES/config/claude"
 CLAUDE_DEST="$HOME/.claude"
 AUTO_YES=false
@@ -16,14 +16,6 @@ for arg in "$@"; do
     -y|--yes) AUTO_YES=true ;;
   esac
 done
-
-# ============================================================
-# Helpers
-# ============================================================
-info()    { printf "  \033[34m•\033[0m %s\n" "$1"; }
-success() { printf "  \033[32m✓\033[0m %s\n" "$1"; }
-warn()    { printf "  \033[33m!\033[0m %s\n" "$1"; }
-section() { printf "\n\033[1;36m➤ %s\033[0m\n" "$1"; }
 
 confirm() {
   if [[ "$AUTO_YES" == true ]]; then

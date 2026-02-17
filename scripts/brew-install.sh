@@ -6,23 +6,11 @@
 
 set -e
 
-DOTFILES="$(cd "$(dirname "$0")/.." && pwd)"
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/common.sh"
 BREW_AUTOUPDATE_INTERVAL=86400  # 24 hours in seconds
 
-info()    { printf "  \033[34m•\033[0m %s\n" "$1"; }
-success() { printf "  \033[32m✓\033[0m %s\n" "$1"; }
-warn()    { printf "  \033[33m!\033[0m %s\n" "$1"; }
-
 # Resolve profile
-PROFILE="${1:-}"
-if [[ -z "$PROFILE" && -f "$HOME/.dotfiles-profile" ]]; then
-  PROFILE=$(cat "$HOME/.dotfiles-profile")
-fi
-if [[ -z "$PROFILE" ]]; then
-  echo "Usage: brew-install.sh <profile>"
-  echo "Or set profile via: echo work > ~/.dotfiles-profile"
-  exit 1
-fi
+PROFILE="$(require_profile "$(basename "$0")" "${1:-}")"
 
 # Install packages
 BREWFILE="$DOTFILES/packages/brew/$PROFILE/Brewfile"
@@ -56,7 +44,10 @@ fi
 
 # Configure autoupdate
 HOURS=$((BREW_AUTOUPDATE_INTERVAL / 3600))
-info "Configuring autoupdate (every ${HOURS}h)..."
-brew autoupdate stop &>/dev/null || true
-brew autoupdate start "$BREW_AUTOUPDATE_INTERVAL" --upgrade --cleanup --immediate &>/dev/null
-success "Autoupdate configured"
+if brew autoupdate status 2>/dev/null | grep -q "installed and running"; then
+  success "Autoupdate running (every ${HOURS}h)"
+else
+  info "Configuring autoupdate (every ${HOURS}h)..."
+  brew autoupdate start "$BREW_AUTOUPDATE_INTERVAL" --upgrade --cleanup &>/dev/null
+  success "Autoupdate configured"
+fi

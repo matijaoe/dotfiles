@@ -5,10 +5,7 @@
 
 set -e
 
-DOTFILES="$(cd "$(dirname "$0")/.." && pwd)"
-
-info()    { printf "  \033[34m•\033[0m %s\n" "$1"; }
-success() { printf "  \033[32m✓\033[0m %s\n" "$1"; }
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/common.sh"
 
 install_tool() {
   local cmd="$1"

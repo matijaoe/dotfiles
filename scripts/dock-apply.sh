@@ -5,24 +5,13 @@
 
 set -euo pipefail
 
-DOTFILES="$(cd "$(dirname "$0")/.." && pwd)"
-
-info()    { printf "  \033[34m•\033[0m %s\n" "$1"; }
-success() { printf "  \033[32m✓\033[0m %s\n" "$1"; }
-warn()    { printf "  \033[33m!\033[0m %s\n" "$1"; }
+source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/common.sh"
 
 # Resolve profile
-PROFILE="${1:-}"
-if [[ -z "$PROFILE" && -f "$HOME/.dotfiles-profile" ]]; then
-  PROFILE="$(cat "$HOME/.dotfiles-profile")"
-fi
-if [[ -z "$PROFILE" ]]; then
-  echo "Usage: dock-apply.sh <profile>"
-  echo "Or set profile via: echo work > ~/.dotfiles-profile"
-  exit 1
-fi
+PROFILE="$(require_profile "$(basename "$0")" "${1:-}")"
 
 DOCK_FILE="$DOTFILES/packages/dock/${PROFILE}.txt"
+
 if [[ ! -f "$DOCK_FILE" ]]; then
   echo "No dock config found at $DOCK_FILE"
   exit 1
@@ -33,28 +22,30 @@ if ! command -v dockutil &>/dev/null; then
   exit 1
 fi
 
-# Optional but recommended: disable "recent apps" so macOS doesn't re-inject items.
-# (This is the "Show suggested and recent apps in Dock" toggle.)
-defaults write com.apple.dock show-recents -bool false >/dev/null 2>&1 || true
+# Disable "Show suggested and recent apps in Dock" to prevent re-injection
+defaults write com.apple.dock show-recents -bool false 2>/dev/null || true
 
-info "Clearing current layout..."
+info "Clearing current dock..."
+
+# Remove all via dockutil
 dockutil --remove all --no-restart &>/dev/null || true
 
-# Belt & suspenders: ensure Dock sections are truly empty.
-# This helps if something else keeps merging items back in.
-defaults write com.apple.dock persistent-apps -array >/dev/null
-defaults write com.apple.dock persistent-others -array >/dev/null
-defaults write com.apple.dock recent-apps -array >/dev/null 2>&1 || true
+# Belt & suspenders: force all dock arrays empty via defaults
+defaults write com.apple.dock persistent-apps -array
+defaults write com.apple.dock persistent-others -array
+defaults write com.apple.dock recent-apps -array 2>/dev/null || true
+
+# CRITICAL: flush the preferences cache NOW, before any adds.
+# Without this, dockutil reads stale cached data and merges old items back in.
+killall cfprefsd 2>/dev/null || true
 
 success "Cleared"
-
 echo ""
-info "Adding apps..."
 
+info "Adding apps..."
 ADDED=0
 SKIPPED=0
 
-# Read file safely (handles spaces like "Notion Calendar.app")
 while IFS= read -r app || [[ -n "$app" ]]; do
   [[ -z "$app" || "$app" == \#* ]] && continue
 
@@ -71,7 +62,7 @@ while IFS= read -r app || [[ -n "$app" ]]; do
   fi
 done < "$DOCK_FILE"
 
-# Single restart at the end
+# Single Dock restart at the end to apply everything at once
 killall Dock 2>/dev/null || true
 
 echo ""
