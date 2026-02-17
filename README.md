@@ -24,8 +24,8 @@ Available scripts via `dots run`:
 ```sh
 dots run brew [profile]          # install Homebrew packages
 dots run symlinks [profile]      # create config symlinks
-dots run dock <profile>          # apply Dock layout
-dots run claude [-y]             # setup Claude Code configs
+dots run dock [profile]          # apply Dock layout
+dots run claude [-y]             # setup Claude Code (interactive)
 dots run macos                   # apply macOS system defaults
 dots run curl                    # install curl-based tools
 ```
@@ -68,15 +68,14 @@ Snapshots the current machine state into the repo, then prompts to commit and pu
 | 3  | Zinit                |                     |                                   |
 | 4  | Profile detection    |                     | prompts if no `--work`/`--personal` |
 | 5  | Brew packages        | `dots run brew`         |                                   |
-| 6  | Symlinks             | `dots run symlinks`     |                                   |
+| 6  | Configs              | `dots run symlinks`     | shell, git, ssh, claude, editors, opencode |
 | 7  | Node (via n)         |                         |                                   |
 | 8  | npm globals          |                         |                                   |
 | 9  | pnpm globals         |                         |                                   |
 | 10 | Curl-installed tools | `dots run curl`         |                                   |
 | 11 | mise                 |                         | work profile only                 |
-| 12 | Claude Code          | `dots run claude [-y]`  | `-y` skips prompts                |
-| 13 | macOS defaults       | `dots run macos`        |                                   |
-| 14 | Dock layout          | `dots run dock`         |                                   |
+| 12 | macOS defaults       | `dots run macos`        |                                   |
+| 13 | Dock layout          | `dots run dock`         |                                   |
 
 ## Structure
 
@@ -106,13 +105,13 @@ dotfiles/
 │   ├── curl-tools.sh                 # tools installed via curl (bun, deno, etc.)
 │   └── apps.md                       # apps installed outside Homebrew (App Store)
 │
-└── scripts/                          # standalone scripts (called by dots CLI)
-    ├── brew-install.sh
-    ├── claude-setup.sh
-    ├── curl-tools.sh
-    ├── dock-apply.sh
-    ├── macos-defaults.sh
-    └── symlinks.sh
+└── scripts/                          # standalone scripts (called by dots run)
+    ├── brew-install.sh               # install Homebrew packages
+    ├── claude-setup.sh               # interactive Claude Code setup (standalone only)
+    ├── curl-tools.sh                 # install curl-based tools
+    ├── dock-apply.sh                 # apply Dock layout
+    ├── macos-defaults.sh             # apply macOS system defaults
+    └── symlinks.sh                   # create all config symlinks
 ```
 
 ## Dock management
@@ -120,6 +119,7 @@ dotfiles/
 Dock layouts are plain text files with one app path per line.
 
 ```sh
-dots run dock work                   # apply work layout
+dots run dock                        # apply layout (uses saved profile)
+dots run dock work                   # or specify profile explicitly
 micro packages/dock/work.txt         # edit manually
 ```

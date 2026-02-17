@@ -8,7 +8,7 @@ DOTFILES="$HOME/dotfiles"
 info()    { printf "  \033[34m•\033[0m %s\n" "$1"; }
 success() { printf "  \033[32m✓\033[0m %s\n" "$1"; }
 warn()    { printf "  \033[33m!\033[0m %s\n" "$1"; }
-section() { printf "\n\033[1;36m➤\033[0m %s\n" "$1"; }
+section() { printf "\n\033[1;36m➤ %s\033[0m\n" "$1"; }
 
 command_exists() { command -v "$1" &>/dev/null; }
 
@@ -187,17 +187,7 @@ else
 fi
 
 # ============================================================
-# 12. Claude Code
-# ============================================================
-section "Claude Code"
-if [[ -f "$DOTFILES/scripts/claude-setup.sh" ]]; then
-  bash "$DOTFILES/scripts/claude-setup.sh" -y
-else
-  warn "scripts/claude-setup.sh not found"
-fi
-
-# ============================================================
-# 13. macOS defaults
+# 12. macOS defaults
 # ============================================================
 section "macOS defaults"
 if [[ -f "$DOTFILES/scripts/macos-defaults.sh" ]]; then
@@ -208,7 +198,7 @@ else
 fi
 
 # ============================================================
-# 14. Dock apps
+# 13. Dock
 # ============================================================
 section "Dock"
 if command_exists dockutil; then

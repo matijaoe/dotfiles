@@ -9,9 +9,9 @@ set -e
 DOTFILES="$(cd "$(dirname "$0")/.." && pwd)"
 BREW_AUTOUPDATE_INTERVAL=86400  # 24 hours in seconds
 
-info()    { printf "\033[34m→\033[0m %s\n" "$1"; }
-success() { printf "\033[32m✓\033[0m %s\n" "$1"; }
-warn()    { printf "\033[33m!\033[0m %s\n" "$1"; }
+info()    { printf "  \033[34m•\033[0m %s\n" "$1"; }
+success() { printf "  \033[32m✓\033[0m %s\n" "$1"; }
+warn()    { printf "  \033[33m!\033[0m %s\n" "$1"; }
 
 # Resolve profile
 PROFILE="${1:-}"
@@ -31,13 +31,17 @@ if [[ ! -f "$BREWFILE" ]]; then
   exit 1
 fi
 
-info "Installing from Brewfile ($PROFILE)..."
-
 _brew_tmp=$(mktemp)
 brew bundle --file="$BREWFILE" > "$_brew_tmp" 2>&1 || true
 
-# Show only installs and upgrades
-grep -E "^(Installing|Upgrading)" "$_brew_tmp" || true
+# Show only installs and upgrades with proper formatting
+while IFS= read -r line; do
+  if [[ "$line" =~ ^Installing[[:space:]](.+) ]]; then
+    info "Installing ${BASH_REMATCH[1]}..."
+  elif [[ "$line" =~ ^Upgrading[[:space:]](.+) ]]; then
+    info "Upgrading ${BASH_REMATCH[1]}..."
+  fi
+done < "$_brew_tmp"
 
 USING=$(grep -cE "^Using " "$_brew_tmp" || true)
 INSTALLING=$(grep -cE "^Installing " "$_brew_tmp" || true)
@@ -51,7 +55,8 @@ else
 fi
 
 # Configure autoupdate
-info "Configuring brew autoupdate..."
+HOURS=$((BREW_AUTOUPDATE_INTERVAL / 3600))
+info "Configuring autoupdate (every ${HOURS}h)..."
 brew autoupdate stop &>/dev/null || true
 brew autoupdate start "$BREW_AUTOUPDATE_INTERVAL" --upgrade --cleanup --immediate &>/dev/null
-success "Brew autoupdate configured (every 24h)"
+success "Autoupdate configured"
