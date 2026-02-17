@@ -126,7 +126,10 @@ echo ""
 if [[ $REPLY =~ ^[Yy]$ ]]; then
   git add -A
   git commit -m "save: $(date '+%Y-%m-%d %H:%M')"
-  git push
+  if ! git push; then
+    error "Push failed"
+    exit 1
+  fi
   success "Saved and pushed"
 else
   info "Skipped — changes are not committed"
