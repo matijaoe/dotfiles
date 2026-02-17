@@ -34,6 +34,9 @@ alias q="~ && clear"
 alias path="echo ${PATH//:/$'\n'}"
 alias src="source ~/.zshrc"
 
+# Fix .. showing as red
+alias ".."="cd .." 
+
 # Network
 alias net="networkQuality"
 alias pw="openssl rand -base64 30 | pbcopy && echo 'Password copied to clipboard'"
@@ -54,11 +57,7 @@ alias ld="lazydocker"
 alias lwt="lazyworktree"
 alias dockerlist='docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Status}}"'
 
-ay-cd() {
-  local dir
-  dir="$(command ay cd "$@")"
-  if [[ $? -eq 0 ]] && [[ -n "$dir" ]] && [[ -d "$dir" ]]; then
-    cd "$dir"
-  fi
-}
-alias acd='ay-cd'
+alias see="glow"
+alias "?"="tldr"
+
+alias ..="cd .." 

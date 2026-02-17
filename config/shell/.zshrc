@@ -6,6 +6,11 @@ fpath=(~/.config/shell/completions $fpath)
 # ============================================================
 # Antidote plugin manager
 # ============================================================
+# compile plugins to bytecode for faster loading
+zstyle ':antidote:*' zcompile 'yes'
+# use short names in `antidote list` instead of mangled URLs
+zstyle ':antidote:bundle' use-friendly-names 'yes'
+
 zsh_plugins=${ZDOTDIR:-$HOME}/.zsh_plugins
 if [[ ! ${zsh_plugins}.zsh -nt ${zsh_plugins}.txt ]]; then
   (
@@ -24,6 +29,11 @@ eval "$(starship init zsh)"
 # Shell enhancements
 # ============================================================
 source /opt/homebrew/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+
+# prevent autosuggestion flicker when using Up/Down with history-substring-search
+ZSH_AUTOSUGGEST_CLEAR_WIDGETS+=(history-substring-search-up history-substring-search-down)
+ZSH_AUTOSUGGEST_CLEAR_WIDGETS=("${(@)ZSH_AUTOSUGGEST_CLEAR_WIDGETS:#(up|down)-line-or-history}")
+
 zsh-defer -c 'FAST_HIGHLIGHT_STYLES[global-alias]="fg=green"'
 
 # fzf — fuzzy finder integration
@@ -59,17 +69,25 @@ source "$HOME/.config/shell/aliases/theydo.zsh"
 # ============================================================
 # PATH and runtime setup
 # ============================================================
+# prepend to PATH only if not already present
+path_prepend() {
+  case ":$PATH:" in
+    *":$1:"*) ;;
+    *) export PATH="$1:$PATH" ;;
+  esac
+}
+
 # n — Node.js version manager
 export N_PREFIX=$HOME/.n
-export PATH=$N_PREFIX/bin:$PATH
+path_prepend "$N_PREFIX/bin"
 
 # bun — completions + binary
 [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
+path_prepend "$BUN_INSTALL/bin"
 
 # local binaries (dots CLI, etc.)
-export PATH="$HOME/.local/bin:$PATH"
+path_prepend "$HOME/.local/bin"
 
 # mise — polyglot runtime manager
 eval "$(mise activate zsh)"
@@ -78,11 +96,8 @@ eval "$(mise activate zsh)"
 if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
 
 # opencode
-export PATH="$HOME/.opencode/bin:$PATH"
+path_prepend "$HOME/.opencode/bin"
 
 # pnpm
 export PNPM_HOME="$HOME/Library/pnpm"
-case ":$PATH:" in
-  *":$PNPM_HOME:"*) ;;
-  *) export PATH="$PNPM_HOME:$PATH" ;;
-esac
+path_prepend "$PNPM_HOME"
