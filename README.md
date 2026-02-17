@@ -7,7 +7,7 @@ Personal dotfiles with profile support for **work** and **personal** machines.
 ```sh
 git clone <repo> ~/dotfiles
 cd ~/dotfiles
-./setup.sh --work
+./setup.sh
 ```
 
 After setup, the `dots` CLI is available. Run `dots help` for full usage.
@@ -28,10 +28,10 @@ dots run curl                    # install curl-based tools
 
 ## Profiles
 
-| Flag           | Includes                                 |
-| -------------- | ---------------------------------------- |
-| `--work`       | Work Brewfile, work SSH config, mise tools |
-| `--personal`   | Personal Brewfile, personal SSH config   |
+| Flag         | Includes                                   |
+| ------------ | ------------------------------------------ |
+| `--work`     | Work Brewfile, work SSH config, mise tools |
+| `--personal` | Personal Brewfile, personal SSH config     |
 
 Profile-specific files live in subdirectories: `packages/brew/work/`, `packages/dock/work.txt`, `config/ssh/config.work`.
 
@@ -45,31 +45,31 @@ Profile is resolved in order:
 
 `dots setup` runs these steps in order:
 
-| #  | Step              | Standalone          | Notes                               |
-| -- | ----------------- | ------------------- | ----------------------------------- |
-| 1  | Xcode CLI Tools   |                     |                                     |
-| 2  | Homebrew          |                     |                                     |
-| 3  | Zinit             |                     |                                     |
-| 4  | Profile detection |                     | prompts if no profile set           |
-| 5  | Brew packages     | `dots run brew`     |                                     |
-| 6  | Symlinks          | `dots run symlinks` | shell, git, ssh, claude, editors    |
-| 7  | Node (via n)      |                     |                                     |
-| 8  | npm globals       |                     |                                     |
-| 9  | pnpm globals      |                     |                                     |
-| 10 | Curl tools        | `dots run curl`     |                                     |
-| 11 | mise              |                     | work profile only                   |
-| 12 | macOS defaults    | `dots run macos`    |                                     |
-| 13 | Dock layout       | `dots run dock`     |                                     |
+| #   | Step              | Standalone          | Notes                            |
+| --- | ----------------- | ------------------- | -------------------------------- |
+| 1   | Xcode CLI Tools   |                     |                                  |
+| 2   | Homebrew          |                     |                                  |
+| 3   | Zinit             |                     |                                  |
+| 4   | Profile detection |                     | prompts if no profile set        |
+| 5   | Brew packages     | `dots run brew`     |                                  |
+| 6   | Symlinks          | `dots run symlinks` | shell, git, ssh, claude, editors |
+| 7   | Node (via n)      |                     |                                  |
+| 8   | npm globals       |                     |                                  |
+| 9   | pnpm globals      |                     |                                  |
+| 10  | Curl tools        | `dots run curl`     |                                  |
+| 11  | mise              |                     | work profile only                |
+| 12  | macOS defaults    | `dots run macos`    |                                  |
+| 13  | Dock layout       | `dots run dock`     |                                  |
 
 ## Save flow
 
 `dots save` snapshots the current machine state and prompts to commit and push.
 
-| #  | Step                  | Output                             |
-| -- | --------------------- | ---------------------------------- |
-| 1  | Read profile          | from `~/.dotfiles-profile`         |
-| 2  | Dump brew packages    | `packages/brew/<profile>/Brewfile` |
-| 3  | Dump Dock pinned apps | `packages/dock/<profile>.txt`      |
-| 4  | Dump npm globals      | `packages/npm-globals.txt`         |
-| 5  | Dump pnpm globals     | `packages/pnpm-globals.txt`        |
-| 6  | Git commit + push     | prompts y/N                        |
+| #   | Step                  | Output                             |
+| --- | --------------------- | ---------------------------------- |
+| 1   | Read profile          | from `~/.dotfiles-profile`         |
+| 2   | Dump brew packages    | `packages/brew/<profile>/Brewfile` |
+| 3   | Dump Dock pinned apps | `packages/dock/<profile>.txt`      |
+| 4   | Dump npm globals      | `packages/npm-globals.txt`         |
+| 5   | Dump pnpm globals     | `packages/pnpm-globals.txt`        |
+| 6   | Git commit + push     | prompts y/N                        |

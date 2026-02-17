@@ -27,7 +27,6 @@ show_help() {
   local CYAN=$'\033[36m'
   local YELLOW=$'\033[33m'
   local COL_W=40
-  local EX_W=28
 
   row() {
     local plain="$1"
@@ -74,21 +73,22 @@ EOF
   printf "\n"
 
   printf "%b%s%b\n" "$BOLD" "PROFILES" "$RESET"
-  printf "  %bpersonal%b, %bwork%b\n" "$YELLOW" "$RESET" "$YELLOW" "$RESET"
+  printf "  %bpersonal%b, %bwork%b\n\n" "$YELLOW" "$RESET" "$YELLOW" "$RESET"
   printf "  Resolved in order:\n"
-  printf "    1. Flag        %b--work%b or %b--personal%b\n" "$YELLOW" "$RESET" "$YELLOW" "$RESET"
-  printf "    2. Saved       %b~/.dotfiles-profile%b\n" "$CYAN" "$RESET"
-  printf "    3. Prompt      %basked during setup%b\n\n" "$DIM" "$RESET"
+  row "1. Flag"    "1. Flag"    "--work or --personal"
+  row "2. Saved"   "2. Saved"   "~/.dotfiles-profile"
+  row "3. Prompt"  "3. Prompt"  "asked during setup"
+  printf "\n"
 
   printf "%b%s%b\n" "$BOLD" "EXAMPLES" "$RESET"
-  printf "  %b%-${EX_W}s%b %b# %s%b\n" "$CYAN" "dots setup --work" "$RESET" "$DIM" "bootstrap new work Mac" "$RESET"
-  printf "  %b%-${EX_W}s%b %b# %s%b\n" "$CYAN" "dots save" "$RESET" "$DIM" "snapshot current state" "$RESET"
-  printf "  %b%-${EX_W}s%b %b# %s%b\n" "$CYAN" "dots run brew" "$RESET" "$DIM" "install Homebrew packages" "$RESET"
-  printf "  %b%-${EX_W}s%b %b# %s%b\n" "$CYAN" "dots run symlinks" "$RESET" "$DIM" "create config symlinks" "$RESET"
-  printf "  %b%-${EX_W}s%b %b# %s%b\n" "$CYAN" "dots run dock --work" "$RESET" "$DIM" "apply work Dock layout" "$RESET"
-  printf "  %b%-${EX_W}s%b %b# %s%b\n" "$CYAN" "dots run macos" "$RESET" "$DIM" "apply macOS defaults" "$RESET"
-  printf "  %b%-${EX_W}s%b %b# %s%b\n" "$CYAN" "dots run claude" "$RESET" "$DIM" "setup Claude Code configs" "$RESET"
-  printf "  %b%-${EX_W}s%b %b# %s%b\n" "$CYAN" "dots run curl" "$RESET" "$DIM" "install curl-based tools" "$RESET"
+  row "dots setup --work"    "${CYAN}dots setup --work${RESET}"    "# bootstrap new work Mac"
+  row "dots save"            "${CYAN}dots save${RESET}"            "# snapshot current state"
+  row "dots run brew"        "${CYAN}dots run brew${RESET}"        "# install Homebrew packages"
+  row "dots run symlinks"    "${CYAN}dots run symlinks${RESET}"    "# create config symlinks"
+  row "dots run dock --work" "${CYAN}dots run dock --work${RESET}" "# apply work Dock layout"
+  row "dots run macos"       "${CYAN}dots run macos${RESET}"       "# apply macOS defaults"
+  row "dots run claude"      "${CYAN}dots run claude${RESET}"      "# setup Claude Code configs"
+  row "dots run curl"        "${CYAN}dots run curl${RESET}"        "# install curl-based tools"
   printf "\n"
 }
 

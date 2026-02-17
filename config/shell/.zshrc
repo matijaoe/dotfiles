@@ -36,7 +36,7 @@ zinit snippet OMZP::npm                      # npm completions + aliases
 # ============================================================
 # GitHub plugins (non-OMZ)
 # ============================================================
-zinit light mat2ja/pnpm.plugin.zsh               # pnpm aliases
+zinit light matijaoe/pnpm.plugin.zsh               # pnpm aliases
 zinit light MichaelAquilina/zsh-you-should-use   # reminds you of your aliases
 zinit ice atclone'./zplug.zsh' atpull'%atclone'
 zinit light g-plane/zsh-yarn-autocompletions     # yarn run/remove/add/why completions
