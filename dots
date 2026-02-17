@@ -60,7 +60,7 @@ EOF
   printf "%b%s%b\n" "$BOLD" "COMMANDS" "$RESET"
   row "setup, init [--work|--personal]"  "${CYAN}setup${RESET}, ${CYAN}init${RESET} [${YELLOW}--work${RESET}|${YELLOW}--personal${RESET}]"  "Bootstrap or re-run full setup"
   row "save, update"                     "${CYAN}save${RESET}, ${CYAN}update${RESET}"                     "Save current machine state to repo"
-  row "run <script> [--work|--personal]"  "${CYAN}run${RESET} <script> [${YELLOW}--work${RESET}|${YELLOW}--personal${RESET}]"  "Run a single script"
+  row "run <script> [profile]"            "${CYAN}run${RESET} <script> [profile]"                               "Run a single script"
   row "help"                             "${CYAN}help${RESET}"                                           "Show this help"
   printf "\n"
 
@@ -74,7 +74,7 @@ EOF
   printf "\n"
 
   printf "%b%s%b\n" "$BOLD" "PROFILES" "$RESET"
-  printf "  Available: %bpersonal%b, %bwork%b\n" "$YELLOW" "$RESET" "$YELLOW" "$RESET"
+  printf "  %bpersonal%b, %bwork%b\n" "$YELLOW" "$RESET" "$YELLOW" "$RESET"
   printf "  Resolved in order:\n"
   printf "    1. Flag        %b--work%b or %b--personal%b\n" "$YELLOW" "$RESET" "$YELLOW" "$RESET"
   printf "    2. Saved       %b~/.dotfiles-profile%b\n" "$CYAN" "$RESET"
