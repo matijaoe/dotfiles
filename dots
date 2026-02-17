@@ -20,31 +20,31 @@ error()   { printf "\033[31m✗\033[0m %s\n" "$1"; }
 
 show_help() {
   cat <<EOF
-dots — dotfiles management CLI
+$(printf "\033[1;36mdots\033[0m") — dotfiles management CLI
 
-Usage: dots <command> [args]
+$(printf "\033[1mUsage:\033[0m") dots <command> [args]
 
-Main commands:
-  setup [--work|--personal]   Full system setup (new Mac bootstrap)
-  save                        Save current state to repo
-  run <script> [args]         Run individual setup script
+$(printf "\033[1mMain commands:\033[0m")
+  $(printf "\033[36msetup\033[0m | \033[36minit\033[0m") [--work|--personal]   Full system setup (new Mac bootstrap)
+  $(printf "\033[36msave\033[0m | \033[36mupdate\033[0m")                      Save current state to repo
+  $(printf "\033[36mrun\033[0m") <script> [args]                Run individual setup script
 
-Available scripts (dots run <script>):
+$(printf "\033[1mAvailable scripts\033[0m") (dots run <script>):
   brew [profile]              Install Homebrew packages
   symlinks [profile]          Create config symlinks
-  dock <profile>              Apply Dock layout
+  dock [profile]              Apply Dock layout
   claude [-y]                 Setup Claude Code configs
   macos                       Apply macOS system defaults
   curl                        Install curl-based tools
 
-Examples:
+$(printf "\033[1mExamples:\033[0m")
   dots setup --work           # bootstrap new work Mac
   dots save                   # snapshot current state
   dots run brew               # re-run brew install (uses saved profile)
   dots run dock work          # apply work dock layout
   dots run claude             # setup Claude (interactive prompts)
 
-Note: Scripts read profile from ~/.dotfiles-profile when not specified.
+$(printf "\033[2mNote:\033[0m") Scripts read profile from ~/.dotfiles-profile when not specified.
 EOF
 }
 
@@ -55,10 +55,10 @@ COMMAND="${1:-}"
 shift || true
 
 case "$COMMAND" in
-  setup)
+  setup|init)
     exec "$DOTFILES/setup.sh" "$@"
     ;;
-  save)
+  save|update)
     exec "$DOTFILES/save.sh" "$@"
     ;;
   run)

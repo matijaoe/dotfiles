@@ -7,16 +7,15 @@ Personal dotfiles with profile support for **work** and **personal** machines.
 ```sh
 git clone <repo> ~/dotfiles
 cd ~/dotfiles
-./setup.sh                    # prompts to pick: work / personal
-./setup.sh --work             # skip prompt, use work profile
+./setup.sh --work             # or: dots init --work
 ```
 
-After setup, the `dots` CLI is available globally:
+The `dots` CLI is available after setup:
 
 ```sh
-dots setup [--work|--personal]   # full system setup
-dots save                        # save current state
-dots run <script> [args]         # run individual setup script
+dots setup | init [--work|--personal]   # full system setup
+dots save | update                      # save current state
+dots run <script> [args]                # run individual setup script
 ```
 
 Available scripts via `dots run`:
