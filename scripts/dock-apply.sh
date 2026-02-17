@@ -1,10 +1,9 @@
 #!/bin/bash
-
 # Apply a Dock configuration from a text file.
 # Usage: bash scripts/dock-apply.sh [profile]
 # Example: bash scripts/dock-apply.sh work
 
-set -e
+set -euo pipefail
 
 DOTFILES="$(cd "$(dirname "$0")/.." && pwd)"
 
@@ -15,7 +14,7 @@ warn()    { printf "  \033[33m!\033[0m %s\n" "$1"; }
 # Resolve profile
 PROFILE="${1:-}"
 if [[ -z "$PROFILE" && -f "$HOME/.dotfiles-profile" ]]; then
-  PROFILE=$(cat "$HOME/.dotfiles-profile")
+  PROFILE="$(cat "$HOME/.dotfiles-profile")"
 fi
 if [[ -z "$PROFILE" ]]; then
   echo "Usage: dock-apply.sh <profile>"
@@ -24,7 +23,6 @@ if [[ -z "$PROFILE" ]]; then
 fi
 
 DOCK_FILE="$DOTFILES/packages/dock/${PROFILE}.txt"
-
 if [[ ! -f "$DOCK_FILE" ]]; then
   echo "No dock config found at $DOCK_FILE"
   exit 1
@@ -35,8 +33,19 @@ if ! command -v dockutil &>/dev/null; then
   exit 1
 fi
 
+# Optional but recommended: disable "recent apps" so macOS doesn't re-inject items.
+# (This is the "Show suggested and recent apps in Dock" toggle.)
+defaults write com.apple.dock show-recents -bool false >/dev/null 2>&1 || true
+
 info "Clearing current layout..."
-dockutil --remove all --no-restart &>/dev/null
+dockutil --remove all --no-restart &>/dev/null || true
+
+# Belt & suspenders: ensure Dock sections are truly empty.
+# This helps if something else keeps merging items back in.
+defaults write com.apple.dock persistent-apps -array >/dev/null
+defaults write com.apple.dock persistent-others -array >/dev/null
+defaults write com.apple.dock recent-apps -array >/dev/null 2>&1 || true
+
 success "Cleared"
 
 echo ""
@@ -45,8 +54,10 @@ info "Adding apps..."
 ADDED=0
 SKIPPED=0
 
+# Read file safely (handles spaces like "Notion Calendar.app")
 while IFS= read -r app || [[ -n "$app" ]]; do
   [[ -z "$app" || "$app" == \#* ]] && continue
+
   name="${app##*/}"
   name="${name%.app}"
 
@@ -60,6 +71,7 @@ while IFS= read -r app || [[ -n "$app" ]]; do
   fi
 done < "$DOCK_FILE"
 
+# Single restart at the end
 killall Dock 2>/dev/null || true
 
 echo ""
