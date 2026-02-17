@@ -3,6 +3,8 @@ tap "chmouel/lazyworktree", "https://github.com/chmouel/lazyworktree"
 tap "homebrew/autoupdate"
 # Simple, modern, secure file encryption
 brew "age"
+# Plugin manager for zsh, inspired by antigen and antibody
+brew "antidote"
 # C library of Git core methods that is re-entrant and linkable
 brew "libgit2"
 # Clone of cat(1) with syntax highlighting and Git integration

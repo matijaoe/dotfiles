@@ -28,7 +28,8 @@ link_file() {
 
 # Shell
 link_file "$DOTFILES/config/shell/.zshrc"          "$HOME/.zshrc"
-link_file "$DOTFILES/config/shell/omz-aliases"     "$HOME/.local/share/zinit/plugins/omz-aliases"
+link_file "$DOTFILES/config/shell/.zsh_plugins.txt"  "$HOME/.zsh_plugins.txt"
+link_file "$DOTFILES/config/shell/aliases"         "$HOME/.config/shell/aliases"
 link_file "$DOTFILES/config/shell/completions"     "$HOME/.config/shell/completions"
 success "Shell"
 

@@ -1,2 +1,1 @@
-surge
 trash-cli

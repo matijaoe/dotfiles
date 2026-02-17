@@ -1,0 +1,8 @@
+alias ls="eza --icons --group-directories-first"
+alias l="eza -l --git --icons --group-directories-first"
+alias ll="eza -l --git --icons --group-directories-first"
+alias la="eza -la --git --icons --group-directories-first"
+alias lt="eza --tree --level=2 --icons --group-directories-first"
+alias tree="eza --tree --icons --group-directories-first"
+alias llm="eza -l --git --sort=modified --icons --group-directories-first"
+alias l.="eza -a --icons | grep -E '^\.'"
