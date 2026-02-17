@@ -17,7 +17,37 @@ bash setup.sh --work --macos  # also apply macOS defaults
 bash save.sh
 ```
 
-Dumps Homebrew packages, Dock layout, npm globals, and pnpm globals for the active profile, then prompts to commit and push.
+Dumps current state for the active profile, then prompts to commit and push.
+
+| # | Step                  | Output                             |
+|---| --------------------- | ---------------------------------- |
+| 1 | Read profile          | from `~/.dotfiles-profile`         |
+| 2 | Dump brew packages    | `packages/brew/<profile>/Brewfile` |
+| 3 | Dump Dock pinned apps | `packages/dock/<profile>.txt`      |
+| 4 | Dump npm globals      | `packages/npm-globals.txt`         |
+| 5 | Dump pnpm globals     | `packages/pnpm-globals.txt`        |
+| 6 | Git commit + push     | prompts y/N before pushing         |
+
+## Setup flow
+
+`setup.sh` runs these steps in order. Steps marked with a script link can also be run standalone.
+
+| #  | Step                  | Script                                       |
+| -- | --------------------- | -------------------------------------------- |
+| 1  | Xcode CLI Tools       |                                              |
+| 2  | Homebrew              |                                              |
+| 3  | Zinit                 |                                              |
+| 4  | Profile detection     |                                              |
+| 5  | Brew packages         | [`scripts/brew-install.sh`](scripts/brew-install.sh) |
+| 6  | Symlinks              | [`scripts/symlinks.sh`](scripts/symlinks.sh) |
+| 7  | Node (via n)          |                                              |
+| 8  | npm globals           |                                              |
+| 9  | pnpm globals          |                                              |
+| 10 | Curl-installed tools  | [`scripts/curl-tools.sh`](scripts/curl-tools.sh) |
+| 11 | mise (work only)      |                                              |
+| 12 | Claude Code           | [`scripts/claude-setup.sh`](scripts/claude-setup.sh) |
+| 13 | macOS defaults        | [`scripts/macos-defaults.sh`](scripts/macos-defaults.sh) |
+| 14 | Dock apps             | [`scripts/dock-apply.sh`](scripts/dock-apply.sh) |
 
 ## What's inside
 
@@ -34,19 +64,6 @@ Dumps Homebrew packages, Dock layout, npm globals, and pnpm globals for the acti
 | `packages/pnpm-globals.txt`        | Global pnpm packages                       |
 | `packages/curl-tools.sh`           | Tools installed via curl (bun, deno, etc.) |
 | `packages/apps.md`                 | Apps installed outside Homebrew            |
-
-## Standalone scripts
-
-Each can run independently or is called by `setup.sh`:
-
-```bash
-bash scripts/brew-install.sh [profile]     # install Brewfile + autoupdate
-bash scripts/symlinks.sh [profile]         # create all config symlinks
-bash scripts/curl-tools.sh                 # install curl-based tools
-bash scripts/claude-setup.sh               # link Claude Code configs (interactive)
-bash scripts/macos-defaults.sh             # apply macOS system defaults + dock
-bash scripts/dock-apply.sh <profile>       # apply dock layout
-```
 
 ## Dock management
 
