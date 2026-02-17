@@ -26,15 +26,15 @@ info "Profile: $PROFILE"
 # 2. Dump brew state
 # ============================================================
 info "Dumping brew packages..."
-mkdir -p "$DOTFILES/brew/$PROFILE"
-brew bundle dump --describe --force --file="$DOTFILES/brew/$PROFILE/Brewfile"
-success "Updated brew/$PROFILE/Brewfile"
+mkdir -p "$DOTFILES/packages/brew/$PROFILE"
+brew bundle dump --describe --force --file="$DOTFILES/packages/brew/$PROFILE/Brewfile"
+success "Updated packages/brew/$PROFILE/Brewfile"
 
 # ============================================================
 # 3. Dump Dock pinned apps
 # ============================================================
 info "Dumping Dock pinned apps..."
-mkdir -p "$DOTFILES/dock"
+mkdir -p "$DOTFILES/packages/dock"
 defaults read com.apple.dock persistent-apps 2>/dev/null | \
   python3 -c "
 import sys, re, urllib.parse
@@ -43,14 +43,15 @@ urls = re.findall(r'\"_CFURLString\"\s*=\s*\"(file://[^\"]+)\"', content)
 for url in urls:
     path = urllib.parse.unquote(url.replace('file://', '').rstrip('/'))
     print(path)
-" > "$DOTFILES/dock/${PROFILE}.txt"
-success "Updated dock/${PROFILE}.txt"
+" > "$DOTFILES/packages/dock/${PROFILE}.txt"
+success "Updated packages/dock/${PROFILE}.txt"
 
 # ============================================================
 # 4. Dump npm globals
 # ============================================================
 info "Dumping npm global packages..."
-npm ls -g --depth=0 --json 2>/dev/null | \
+_npm_tmp=$(mktemp)
+if npm ls -g --depth=0 --json 2>/dev/null | \
   python3 -c "
 import sys, json
 data = json.load(sys.stdin)
@@ -60,11 +61,43 @@ skip = {'npm', 'corepack'}
 for name, info in sorted(deps.items()):
     if name not in skip and not info.get('resolved', '').startswith('file:'):
         print(name)
-" > "$DOTFILES/npm-globals.txt"
-success "Updated npm-globals.txt"
+" > "$_npm_tmp" 2>/dev/null; then
+  mv "$_npm_tmp" "$DOTFILES/packages/npm-globals.txt"
+  success "Updated packages/npm-globals.txt"
+else
+  rm -f "$_npm_tmp"
+  warn "Failed to dump npm globals — keeping existing file"
+fi
 
 # ============================================================
-# 5. Git commit + push
+# 5. Dump pnpm globals
+# ============================================================
+export PNPM_HOME="$HOME/Library/pnpm"
+export PATH="$PNPM_HOME:$PATH"
+if command -v pnpm &>/dev/null; then
+  info "Dumping pnpm global packages..."
+  _pnpm_tmp=$(mktemp)
+  if pnpm ls -g --json 2>/dev/null | \
+    python3 -c "
+import sys, json
+data = json.load(sys.stdin)
+for store in data:
+    deps = store.get('dependencies', {})
+    for name in sorted(deps.keys()):
+        print(name)
+" > "$_pnpm_tmp" 2>/dev/null; then
+    mv "$_pnpm_tmp" "$DOTFILES/packages/pnpm-globals.txt"
+    success "Updated packages/pnpm-globals.txt"
+  else
+    rm -f "$_pnpm_tmp"
+    warn "Failed to dump pnpm globals — keeping existing file"
+  fi
+else
+  warn "pnpm not found — skipping pnpm globals dump"
+fi
+
+# ============================================================
+# 6. Git commit + push
 # ============================================================
 cd "$DOTFILES"
 

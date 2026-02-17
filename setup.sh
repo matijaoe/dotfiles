@@ -13,6 +13,18 @@ step()    { printf "\n\033[1;35m%s\033[0m\n" "$1"; }
 
 command_exists() { command -v "$1" &>/dev/null; }
 
+install_tool() {
+  local cmd="$1"
+  local install_cmd="$2"
+  if command_exists "$cmd"; then
+    success "$cmd already installed"
+  else
+    info "Installing $cmd..."
+    eval "$install_cmd"
+    success "$cmd installed (available in new terminal)"
+  fi
+}
+
 # ============================================================
 # Parse flags
 # ============================================================
@@ -90,7 +102,7 @@ echo "$PROFILE" > "$HOME/.dotfiles-profile"
 # 5. Brew bundle
 # ============================================================
 step "5. Brew packages"
-BREWFILE="$DOTFILES/brew/$PROFILE/Brewfile"
+BREWFILE="$DOTFILES/packages/brew/$PROFILE/Brewfile"
 if [[ ! -f "$BREWFILE" ]]; then
   warn "No Brewfile found at $BREWFILE — skipping"
 else
@@ -133,17 +145,18 @@ link_file() {
   success "Linked: $dest → $src"
 }
 
-link_file "$DOTFILES/shell/.zshrc"              "$HOME/.zshrc"
-link_file "$DOTFILES/shell/omz-aliases"         "$HOME/.local/share/zinit/plugins/omz-aliases"
-link_file "$DOTFILES/config/starship.toml"      "$HOME/.config/starship.toml"
-link_file "$DOTFILES/config/ghostty/config"     "$HOME/.config/ghostty/config"
-link_file "$DOTFILES/config/micro/settings.json" "$HOME/.config/micro/settings.json"
-link_file "$DOTFILES/config/micro/bindings.json" "$HOME/.config/micro/bindings.json"
-link_file "$DOTFILES/config/gh/config.yml"      "$HOME/.config/gh/config.yml"
-link_file "$DOTFILES/config/gh-dash/config.yml" "$HOME/.config/gh-dash/config.yml"
-link_file "$DOTFILES/git/.gitconfig"            "$HOME/.gitconfig"
-link_file "$DOTFILES/git/ignore"                "$HOME/.config/git/ignore"
-link_file "$DOTFILES/ssh/config.$PROFILE"       "$HOME/.ssh/config"
+link_file "$DOTFILES/config/shell/.zshrc"          "$HOME/.zshrc"
+link_file "$DOTFILES/config/shell/omz-aliases"     "$HOME/.local/share/zinit/plugins/omz-aliases"
+link_file "$DOTFILES/config/starship.toml"         "$HOME/.config/starship.toml"
+link_file "$DOTFILES/config/ghostty/config"        "$HOME/.config/ghostty/config"
+link_file "$DOTFILES/config/ghostty/config"        "$HOME/Library/Application Support/com.mitchellh.ghostty/config"
+link_file "$DOTFILES/config/micro/settings.json"   "$HOME/.config/micro/settings.json"
+link_file "$DOTFILES/config/micro/bindings.json"   "$HOME/.config/micro/bindings.json"
+link_file "$DOTFILES/config/gh/config.yml"         "$HOME/.config/gh/config.yml"
+link_file "$DOTFILES/config/gh-dash/config.yml"    "$HOME/.config/gh-dash/config.yml"
+link_file "$DOTFILES/config/git/.gitconfig"        "$HOME/.gitconfig"
+link_file "$DOTFILES/config/git/ignore"            "$HOME/.config/git/ignore"
+link_file "$DOTFILES/config/ssh/config.$PROFILE"   "$HOME/.ssh/config"
 
 # ============================================================
 # 7. Node (n)
@@ -171,9 +184,9 @@ fi
 # 8. npm global packages
 # ============================================================
 step "8. npm globals"
-if command_exists npm && [[ -f "$DOTFILES/npm-globals.txt" ]]; then
+if command_exists npm && [[ -f "$DOTFILES/packages/npm-globals.txt" ]]; then
   info "Installing npm global packages..."
-  xargs npm install -g < "$DOTFILES/npm-globals.txt"
+  xargs npm install -g < "$DOTFILES/packages/npm-globals.txt"
   success "Done"
 elif ! command_exists npm; then
   warn "npm not found — install Node first"
@@ -182,68 +195,36 @@ else
 fi
 
 # ============================================================
-# 9. Curl-installed tools (self-updating)
+# 9. pnpm global packages
 # ============================================================
-step "9. Curl-installed tools"
-
-# Bun
-if command_exists bun; then
-  success "Bun already installed: $(bun --version)"
+step "9. pnpm globals"
+if command_exists pnpm && [[ -f "$DOTFILES/packages/pnpm-globals.txt" ]]; then
+  # Ensure PNPM_HOME is set up
+  export PNPM_HOME="$HOME/Library/pnpm"
+  export PATH="$PNPM_HOME:$PATH"
+  if [[ ! -d "$PNPM_HOME" ]]; then
+    info "Running pnpm setup..."
+    pnpm setup
+  fi
+  info "Installing pnpm global packages..."
+  xargs pnpm install -g < "$DOTFILES/packages/pnpm-globals.txt"
+  success "Done"
+elif ! command_exists pnpm; then
+  warn "pnpm not found — skipping"
 else
-  info "Installing Bun..."
-  curl -fsSL https://bun.sh/install | bash
-  success "Bun installed (available in new terminal)"
-fi
-
-# Deno
-if command_exists deno; then
-  success "Deno already installed: $(deno --version | head -1)"
-else
-  info "Installing Deno..."
-  curl -fsSL https://deno.land/install.sh | sh
-  success "Deno installed (available in new terminal)"
-fi
-
-# Claude Code
-if command_exists claude; then
-  success "Claude Code already installed"
-else
-  info "Installing Claude Code..."
-  curl -fsSL https://claude.ai/install.sh | bash
-  success "Claude Code installed (available in new terminal)"
-fi
-
-# OpenCode
-if command_exists opencode; then
-  success "OpenCode already installed"
-else
-  info "Installing OpenCode..."
-  curl -fsSL https://opencode.ai/install | bash
-  success "OpenCode installed (available in new terminal)"
-fi
-
-# Cursor CLI
-if command_exists cursor; then
-  success "Cursor already installed"
-else
-  info "Installing Cursor..."
-  curl https://cursor.com/install -fsS | bash
-  success "Cursor installed (available in new terminal)"
-fi
-
-# Amp Code
-if command_exists amp; then
-  success "Amp Code already installed"
-else
-  info "Installing Amp Code..."
-  curl -fsSL https://ampcode.com/install.sh | bash
-  success "Amp Code installed (available in new terminal)"
+  warn "pnpm-globals.txt not found"
 fi
 
 # ============================================================
-# 10. mise (work profile only)
+# 10. Curl-installed tools (self-updating)
 # ============================================================
-step "10. mise"
+step "10. Curl-installed tools"
+source "$DOTFILES/packages/curl-tools.sh"
+
+# ============================================================
+# 11. mise (work profile only)
+# ============================================================
+step "11. mise"
 if [[ "$PROFILE" == "work" ]] && command_exists mise; then
   info "Installing work tools via mise..."
   mise use --global awscli kubectl sops
@@ -255,30 +236,30 @@ else
 fi
 
 # ============================================================
-# 11. macOS defaults
+# 12. macOS defaults
 # ============================================================
 if [[ "$APPLY_MACOS" == true ]]; then
-  step "11. macOS defaults"
-  if [[ -f "$DOTFILES/macos.sh" ]]; then
+  step "12. macOS defaults"
+  if [[ -f "$DOTFILES/scripts/macos.sh" ]]; then
     info "Applying macOS defaults..."
-    bash "$DOTFILES/macos.sh"
+    bash "$DOTFILES/scripts/macos.sh"
     success "Done — some changes require a restart"
   else
     warn "macos.sh not found"
   fi
 else
-  step "11. macOS defaults (skipped — use --macos to apply)"
+  step "12. macOS defaults (skipped — use --macos to apply)"
 fi
 
 # ============================================================
-# 12. Dock apps
+# 13. Dock apps
 # ============================================================
-step "12. Dock apps"
-DOCK_FILE="$DOTFILES/dock/${PROFILE}.txt"
+step "13. Dock apps"
+DOCK_FILE="$DOTFILES/packages/dock/${PROFILE}.txt"
 if [[ -f "$DOCK_FILE" ]]; then
   if command_exists dockutil; then
     info "Applying Dock layout for $PROFILE..."
-    bash "$DOTFILES/dock/apply.sh" "$PROFILE"
+    bash "$DOTFILES/scripts/dock-apply.sh" "$PROFILE"
     success "Done"
   else
     warn "dockutil not found — install with: brew install dockutil"
@@ -309,7 +290,7 @@ if [[ "$PROFILE" == "work" ]] && ! docker info &>/dev/null; then
   MANUAL_STEPS+=("Open OrbStack to complete Docker setup")
 fi
 
-MANUAL_STEPS+=("Sign in to App Store for manual app installs (see apps.md)")
+MANUAL_STEPS+=("Sign in to App Store for manual app installs (see packages/apps.md)")
 
 if [[ ${#MANUAL_STEPS[@]} -gt 0 ]]; then
   echo "Manual steps:"

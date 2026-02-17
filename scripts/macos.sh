@@ -1,8 +1,10 @@
 #!/bin/bash
 
 # macOS defaults
-# Run: ./setup.sh --macos (or directly: bash macos.sh)
+# Run: ./setup.sh --macos (or directly: bash scripts/macos.sh)
 # Some changes require a logout/restart to take effect.
+
+DOTFILES="$(cd "$(dirname "$0")/.." && pwd)"
 
 # Close System Settings to prevent it from overriding changes
 osascript -e 'tell application "System Settings" to quit' 2>/dev/null
@@ -168,3 +170,15 @@ for app in "Activity Monitor" "cfprefsd" "Dock" "Finder" "Safari" "SystemUIServe
 done
 
 echo "macOS defaults applied. Some changes require a logout/restart."
+
+###############################################################################
+# Dock layout                                                                 #
+###############################################################################
+
+if [[ -f "$HOME/.dotfiles-profile" ]]; then
+  PROFILE=$(cat "$HOME/.dotfiles-profile")
+  if [[ -f "$DOTFILES/scripts/dock-apply.sh" ]]; then
+    echo "Applying Dock layout for $PROFILE..."
+    bash "$DOTFILES/scripts/dock-apply.sh" "$PROFILE"
+  fi
+fi

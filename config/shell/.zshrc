@@ -1,44 +1,4 @@
 # ============================================================
-# CLI Toolkit Reference
-# ============================================================
-# ls, l, ll, la, lt, tree, llm, l. → eza     (modern ls with icons/git)
-# cat                              → bat      (syntax-highlighted file viewer)
-# rm                               → trash    (safe delete to trash)
-# cd / z                           → zoxide   (smart cd, learns frequent dirs)
-# grep → rg                        → ripgrep  (fast recursive search)
-# find → fd                                   (fast file finder)
-# git diff                         → delta    (beautiful diffs, side-by-side)
-# man  → tldr                      → tlrc     (community cheat sheets)
-# du   → dust                                 (visual disk usage)
-# df   → duf                                  (visual disk free)
-# jq                                          (JSON processor)
-# hyperfine "cmd"                             (benchmark commands)
-# lg                               → lazygit  (terminal git UI)
-# ld                               → lazydocker (terminal docker UI)
-# lwt                              → lazyworktree (git worktree TUI)
-# gh dash                                     (GitHub PR/issues dashboard)
-# yazi                                        (terminal file manager)
-# btm                              → bottom   (system monitor)
-# gh                                          (GitHub CLI — PRs, issues, repos)
-# fzf                                         (fuzzy finder — powers Ctrl+R, Ctrl+T, Tab)
-# starship                                    (prompt theme)
-# micro                                       (terminal text editor)
-# glow                                        (render markdown in terminal)
-# repomix                                     (pack repo into single file for LLMs)
-# onefetch                                    (git repo stats summary)
-# yt-dlp                                      (download videos from YouTube etc.)
-# ncdu                                        (interactive disk usage explorer)
-# fastfetch                                   (system info display)
-#
-# Keybindings:
-# Ctrl+R   → fuzzy history search (fzf)
-# Ctrl+T   → fuzzy file finder (fzf)
-# Alt+C    → fuzzy cd (fzf)
-# Tab      → fzf-powered completion
-# Esc Esc  → prepend sudo
-# Up/Down  → history substring search
-
-# ============================================================
 # Zinit plugin manager
 # ============================================================
 ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
@@ -73,6 +33,8 @@ zinit snippet OMZP::npm                      # npm completions + aliases
 # ============================================================
 zinit light mat2ja/pnpm.plugin.zsh               # pnpm aliases
 zinit light MichaelAquilina/zsh-you-should-use   # reminds you of your aliases
+zinit ice atclone'./zplug.zsh' atpull'%atclone'
+zinit light g-plane/zsh-yarn-autocompletions     # yarn run/remove/add/why completions
 
 # ============================================================
 # Aliases plugin (multi-file, loaded locally)
@@ -104,9 +66,15 @@ eval "$(zoxide init zsh)"
 # delta — better git diffs (configured in ~/.gitconfig)
 
 # ============================================================
+# Homebrew
+# ============================================================
+export HOMEBREW_NO_AUTO_UPDATE=1   # brew autoupdate handles this on a schedule
+export HOMEBREW_NO_ENV_HINTS=1     # suppress "Adjust how often..." hints
+
+# ============================================================
 # Editor
 # ============================================================
-export EDITOR=nano
+export EDITOR=micro
 export VISUAL="$EDITOR"
 
 # ============================================================
@@ -231,3 +199,15 @@ if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)
 
 # opencode
 export PATH=/Users/matijao/.opencode/bin:$PATH
+
+# omnara
+export OMNARA_INSTALL="$HOME/.omnara"
+export PATH="$OMNARA_INSTALL/bin:$PATH"
+
+# pnpm
+export PNPM_HOME="$HOME/Library/pnpm"
+case ":$PATH:" in
+  *":$PNPM_HOME:"*) ;;
+  *) export PATH="$PNPM_HOME:$PATH" ;;
+esac
+# pnpm end

@@ -69,6 +69,8 @@ brew "p7zip"
 brew "pinentry-mac"
 # Prettier daemon
 brew "prettierd"
+# File browser
+brew "ranger"
 # Pack repository contents into a single AI-friendly file
 brew "repomix"
 # Search tool like grep and The Silver Searcher
