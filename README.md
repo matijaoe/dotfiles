@@ -5,9 +5,15 @@ Personal dotfiles with profile support for **work** and **personal** machines.
 ## Quick start
 
 ```sh
-git clone <repo> ~/dotfiles
+curl -fsSL raw.githubusercontent.com/matijaoe/dotfiles/main/install.sh | bash
+```
+
+Or manually:
+
+```sh
+git clone https://github.com/matijaoe/dotfiles.git ~/dotfiles
 cd ~/dotfiles
-./setup.sh
+./setup.sh --work    # or --personal
 ```
 
 After setup, the `dots` CLI is available. Run `dots help` for full usage.

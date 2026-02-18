@@ -265,5 +265,6 @@
   },
   "alwaysThinkingEnabled": true,
   "autoUpdatesChannel": "latest",
-  "showTurnDuration": true
+  "showTurnDuration": true,
+  "effortLevel": "medium"
 }

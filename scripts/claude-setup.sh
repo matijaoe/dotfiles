@@ -20,10 +20,7 @@ link_file() {
 
   # Check if this would override an existing non-symlinked file
   if [[ -e "$dest" && ! -L "$dest" ]] || [[ -L "$dest" && "$(readlink "$dest")" != "$src" ]]; then
-    local reply
-    printf "  %s exists and differs — override? [y/N] " "$name"
-    read -r reply
-    if [[ ! "$reply" =~ ^[Yy]$ ]]; then
+    if ! confirm "$name exists and differs — override?"; then
       info "$name (skipped)"
       return
     fi
@@ -32,10 +29,11 @@ link_file() {
   symlink_with_backup "$src" "$dest"
   case "$SYMLINK_RESULT" in
     already_linked)
+      success "$name"
       ((LINKED++)) || true
       ;;
     replaced)
-      warn "$name (backed up existing → ${name}.bak)"
+      warn "$name (backed up → ${name}.bak)"
       ((REPLACED++)) || true
       ;;
     created)
@@ -69,7 +67,7 @@ link_file "$CLAUDE_SRC/skills" "$CLAUDE_DEST/skills"
 echo ""
 TOTAL=$((LINKED + CREATED + REPLACED))
 if [[ "$CREATED" -eq 0 && "$REPLACED" -eq 0 ]]; then
-  printf "\033[32m✓\033[0m %d/%d up to date\n" "$TOTAL" "$TOTAL"
+  summary "$TOTAL/$TOTAL up to date"
 else
-  printf "\033[32m✓\033[0m %d created, %d replaced, %d already linked\n" "$CREATED" "$REPLACED" "$LINKED"
+  summary "$CREATED created, $REPLACED replaced, $LINKED already linked"
 fi
