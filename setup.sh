@@ -23,11 +23,13 @@ trap cleanup EXIT
 # Parse flags
 # ============================================================
 PROFILE=""
+FORCE_FLAG=""
 
 for arg in "$@"; do
   case "$arg" in
     --work)     PROFILE="work" ;;
     --personal) PROFILE="personal" ;;
+    -y)         FORCE_FLAG="-y" ;;
     *)          echo "Unknown flag: $arg"; exit 1 ;;
   esac
 done
@@ -121,7 +123,7 @@ bash "$DOTFILES/scripts/symlinks.sh" "--$PROFILE"
 # 7. Cursor (copy-based — Cursor overwrites symlinks on save)
 # ============================================================
 if command_exists cursor; then
-  bash "$DOTFILES/scripts/cursor-setup.sh"
+  bash "$DOTFILES/scripts/cursor-setup.sh" ${FORCE_FLAG:+"$FORCE_FLAG"}
 else
   section "Cursor"
   warn "cursor not found — install via brew first"

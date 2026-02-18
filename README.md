@@ -56,7 +56,7 @@ Profile is resolved in order:
 | --- | ----------------- | ------------------- | -------------------------------- |
 | 1   | Xcode CLI Tools   |                     |                                  |
 | 2   | Homebrew          |                     |                                  |
-| 3   | Zinit             |                     |                                  |
+| 3   | Antidote          |                     |                                  |
 | 4   | Profile detection |                     | prompts if no profile set        |
 | 5   | Brew packages     | `dots run brew`     | incl. Cursor extensions          |
 | 6   | Symlinks          | `dots run symlinks` | shell, git, ssh, claude, editors |
