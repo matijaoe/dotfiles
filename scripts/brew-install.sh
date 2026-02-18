@@ -9,6 +9,8 @@ set -euo pipefail
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/lib/common.sh"
 BREW_AUTOUPDATE_INTERVAL=86400  # 24 hours in seconds
 
+section "Brew packages"
+
 # Resolve profile
 PROFILE="$(require_profile "$@")"
 
@@ -29,6 +31,11 @@ USING=0
 INSTALLING=0
 UPGRADING=0
 
+# Count Brewfile entries by type
+BREW_COUNT=$(grep -c '^brew ' "$BREWFILE" 2>/dev/null || echo 0)
+CASK_COUNT=$(grep -c '^cask ' "$BREWFILE" 2>/dev/null || echo 0)
+VSCODE_COUNT=$(grep -c '^vscode ' "$BREWFILE" 2>/dev/null || echo 0)
+
 # Stream brew bundle output for real-time feedback
 while IFS= read -r line; do
   if [[ "$line" =~ ^Using[[:space:]](.+) ]]; then
@@ -48,11 +55,11 @@ done < <(brew bundle --file="$BREWFILE" 2>&1 || true)
 
 clear_line
 
-if [[ "$INSTALLING" -eq 0 && "$UPGRADING" -eq 0 ]]; then
-  success "$USING packages up to date"
-else
-  success "$INSTALLING installed, $UPGRADING upgraded, $USING already up to date"
-fi
+PARTS=()
+[[ "$INSTALLING" -gt 0 ]] && PARTS+=("$INSTALLING installed")
+[[ "$UPGRADING" -gt 0 ]] && PARTS+=("$UPGRADING upgraded")
+PARTS+=("$BREW_COUNT formulae, $CASK_COUNT casks, $VSCODE_COUNT extensions up to date")
+success "$(IFS='; '; echo "${PARTS[*]}")"
 
 # Configure autoupdate
 HOURS=$((BREW_AUTOUPDATE_INTERVAL / 3600))

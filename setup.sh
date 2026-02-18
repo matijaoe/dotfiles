@@ -89,22 +89,7 @@ elif [[ -x /usr/local/bin/brew ]]; then
 fi
 
 # ============================================================
-# 3. Zinit
-# ============================================================
-section "Zinit"
-ZINIT_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}/zinit/zinit.git"
-if [[ -d "$ZINIT_HOME" ]]; then
-  success "Already installed"
-else
-  info "Installing Zinit..."
-  mkdir -p "$(dirname "$ZINIT_HOME")"
-  gum spin --spinner dot --title "Cloning Zinit..." -- \
-    git clone --quiet https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
-  success "Done"
-fi
-
-# ============================================================
-# 4. Detect profile
+# 3. Detect profile
 # ============================================================
 section "Profile"
 if [[ -z "$PROFILE" ]]; then
@@ -122,13 +107,11 @@ echo "$PROFILE" > "$HOME/.dotfiles-profile"
 # ============================================================
 # 5. Brew bundle
 # ============================================================
-section "Brew packages"
 bash "$DOTFILES/scripts/brew-install.sh" "--$PROFILE"
 
 # ============================================================
 # 6. Symlinks
 # ============================================================
-section "Symlinks"
 bash "$DOTFILES/scripts/symlinks.sh" "--$PROFILE"
 
 # ============================================================
@@ -141,12 +124,29 @@ export PATH="$N_PREFIX/bin:$PATH"
 mkdir -p "$N_PREFIX"
 
 if command_exists n; then
-  if command_exists node; then
-    success "Node already installed: $(node --version)"
-  else
+  CURRENT_VER=$(node --version 2>/dev/null || echo "")
+  LTS_VER=$(n --lts 2>/dev/null || echo "")
+  LATEST_VER=$(n --latest 2>/dev/null || echo "")
+
+  if [[ -z "$CURRENT_VER" ]]; then
     gum spin --spinner dot --title "Installing Node LTS..." -- n lts
     gum spin --spinner dot --title "Installing Node latest..." -- n latest
-    success "Node installed: $(node --version)"
+    n lts &>/dev/null
+    CURRENT_VER=$(node --version)
+    LTS_VER=$(n --lts)
+    LATEST_VER=$(n --latest)
+  fi
+
+  if [[ "$CURRENT_VER" == "v$LTS_VER" ]]; then
+    success "v$LTS_VER (lts, active)"
+    success "v$LATEST_VER (latest)"
+  elif [[ "$CURRENT_VER" == "v$LATEST_VER" ]]; then
+    success "v$LTS_VER (lts)"
+    success "v$LATEST_VER (latest, active)"
+  else
+    success "v$LTS_VER (lts)"
+    success "v$LATEST_VER (latest)"
+    success "$CURRENT_VER (active)"
   fi
 else
   warn "n not found — should be installed via brew in step 5"
@@ -156,6 +156,8 @@ fi
 # 8. npm global packages
 # ============================================================
 section "npm globals"
+NPM_TOTAL=0
+NPM_INSTALLED=0
 if command_exists npm && [[ -f "$DOTFILES/packages/npm-globals.txt" ]]; then
   NPM_LIST_READY=true
   NPM_INSTALLED_FILE="$(mktemp)"
@@ -170,15 +172,28 @@ for name in sorted(data.get("dependencies", {}).keys()):
   fi
   while IFS= read -r pkg; do
     [[ -z "$pkg" || "$pkg" == \#* ]] && continue
+    ((NPM_TOTAL++)) || true
     if [[ "$NPM_LIST_READY" == true ]] && grep -Fxq "$pkg" "$NPM_INSTALLED_FILE"; then
       success "$pkg"
     elif npm list -g "$pkg" --depth=0 &>/dev/null; then
       success "$pkg"
     else
       info "Installing $pkg..."
-      npm install -g "$pkg" &>/dev/null && success "$pkg" || warn "$pkg (failed)"
+      if npm install -g "$pkg" &>/dev/null; then
+        success "$pkg"
+        ((NPM_INSTALLED++)) || true
+      else
+        warn "$pkg (failed)"
+      fi
     fi
   done < "$DOTFILES/packages/npm-globals.txt"
+  if [[ "$NPM_TOTAL" -eq 0 ]]; then
+    summary "No packages configured"
+  elif [[ "$NPM_INSTALLED" -eq 0 ]]; then
+    summary "$NPM_TOTAL packages up to date"
+  else
+    summary "$NPM_INSTALLED installed, $((NPM_TOTAL - NPM_INSTALLED)) already up to date"
+  fi
 elif ! command_exists npm; then
   warn "npm not found — install Node first"
 else
@@ -189,6 +204,8 @@ fi
 # 9. pnpm global packages
 # ============================================================
 section "pnpm globals"
+PNPM_TOTAL=0
+PNPM_INSTALLED=0
 if command_exists pnpm && [[ -f "$DOTFILES/packages/pnpm-globals.txt" ]]; then
   # Ensure PNPM_HOME is set up
   export PNPM_HOME="$HOME/Library/pnpm"
@@ -217,15 +234,28 @@ for name in sorted(deps.keys()):
   fi
   while IFS= read -r pkg; do
     [[ -z "$pkg" || "$pkg" == \#* ]] && continue
+    ((PNPM_TOTAL++)) || true
     if [[ "$PNPM_LIST_READY" == true ]] && grep -Fxq "$pkg" "$PNPM_INSTALLED_FILE"; then
       success "$pkg"
     elif pnpm list -g "$pkg" &>/dev/null; then
       success "$pkg"
     else
       info "Installing $pkg..."
-      pnpm install -g "$pkg" &>/dev/null && success "$pkg" || warn "$pkg (failed)"
+      if pnpm install -g "$pkg" &>/dev/null; then
+        success "$pkg"
+        ((PNPM_INSTALLED++)) || true
+      else
+        warn "$pkg (failed)"
+      fi
     fi
   done < "$DOTFILES/packages/pnpm-globals.txt"
+  if [[ "$PNPM_TOTAL" -eq 0 ]]; then
+    summary "No packages configured"
+  elif [[ "$PNPM_INSTALLED" -eq 0 ]]; then
+    summary "$PNPM_TOTAL packages up to date"
+  else
+    summary "$PNPM_INSTALLED installed, $((PNPM_TOTAL - PNPM_INSTALLED)) already up to date"
+  fi
 elif ! command_exists pnpm; then
   warn "pnpm not found — skipping"
 else
@@ -235,7 +265,6 @@ fi
 # ============================================================
 # 10. Curl-installed tools (self-updating)
 # ============================================================
-section "Curl-installed tools"
 bash "$DOTFILES/scripts/curl-tools.sh"
 
 # ============================================================
@@ -267,7 +296,6 @@ fi
 # ============================================================
 # 13. Dock
 # ============================================================
-section "Dock"
 if command_exists dockutil; then
   bash "$DOTFILES/scripts/dock-apply.sh" "--$PROFILE"
 else
@@ -278,28 +306,31 @@ fi
 # Summary
 # ============================================================
 echo ""
-gum style --bold --foreground 2 "✓ Setup complete!"
+gum style --bold --foreground 2 --border rounded --border-foreground 2 --padding "0 2" "✓ Setup complete!"
 
 # Post-setup checks
-section "Manual steps"
+MANUAL_STEPS=()
 
 if ! command_exists op || ! op account list &>/dev/null 2>&1; then
-  warn "1Password SSH Agent not configured"
-  info "Open 1Password → Settings → Developer → enable SSH Agent"
-  info "Sign in to CLI: op signin"
+  MANUAL_STEPS+=("1Password SSH Agent — Settings → Developer → enable SSH Agent")
 fi
 
 if [[ ! -f "$HOME/.ssh/key-github" ]]; then
-  warn "SSH key not found"
-  info "Export from 1Password or generate new: ~/.ssh/key-github"
+  MANUAL_STEPS+=("SSH key — export from 1Password or generate ~/.ssh/key-github")
 fi
 
 if [[ "$PROFILE" == "work" ]] && ! docker info &>/dev/null; then
-  warn "Docker not running"
-  info "Open OrbStack to complete setup"
+  MANUAL_STEPS+=("Docker — open OrbStack to complete setup")
 fi
 
-warn "App Store sign-in required"
-info "Install apps from $DOTFILES/packages/apps.md"
+MANUAL_STEPS+=("App Store — sign in and install apps from packages/apps.md")
+
+if [[ ${#MANUAL_STEPS[@]} -gt 0 ]]; then
+  echo ""
+  gum style --bold --foreground 214 "➤ Manual steps"
+  for step in "${MANUAL_STEPS[@]}"; do
+    warn "$step"
+  done
+fi
 
 echo ""

@@ -171,7 +171,12 @@ case "$COMMAND" in
         exec "$DOTFILES/scripts/claude-setup.sh" "$@"
         ;;
       macos)
-        exec "$DOTFILES/scripts/macos-defaults.sh" "$@"
+        source "$DOTFILES/scripts/lib/common.sh"
+        section "macOS defaults"
+        gum spin --spinner dot --title "Applying macOS defaults..." -- \
+          bash "$DOTFILES/scripts/macos-defaults.sh"
+        success "Applied — some changes require restart"
+        exit 0
         ;;
       curl)
         exec "$DOTFILES/scripts/curl-tools.sh" "$@"

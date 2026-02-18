@@ -18,12 +18,13 @@ has_gum() { command -v gum &>/dev/null; }
 
 # ============================================================
 # Output helpers
+# Icon is colored, text stays white.
 # ============================================================
 info()    { printf "  \033[34m•\033[0m %s\n" "$1"; }
 success() { printf "  \033[32m✓\033[0m %s\n" "$1"; }
 warn()    { printf "  \033[33m!\033[0m %s\n" "$1"; }
 error()   { printf "  \033[31m✗\033[0m %s\n" "$1"; }
-summary() { printf "\033[32m✓\033[0m %s\n" "$1"; }
+summary() { printf "\n  \033[32m✓\033[0m \033[1m%s\033[0m\n" "$1"; }
 
 section() {
   echo ""
