@@ -1,0 +1,141 @@
+[
+  {
+    "key": "cmd+k",
+    "command": "-pieces-vscode.search",
+    "when": "editorHasMultipleSelections || editorHasSelection || editorTextFocus"
+  },
+  {
+    "key": "shift+cmd+v",
+    "command": "-pieces-vscode.saveToPieces",
+    "when": "editorHasMultipleSelections || editorHasSelection || editorTextFocus"
+  },
+  {
+    "key": "alt+down",
+    "command": "-markdown.extension.onMoveLineDown",
+    "when": "editorTextFocus && !editorReadonly && !suggestWidgetVisible && editorLangId == 'markdown'"
+  },
+  {
+    "key": "alt+up",
+    "command": "-markdown.extension.onMoveLineUp",
+    "when": "editorTextFocus && !editorReadonly && !suggestWidgetVisible && editorLangId == 'markdown'"
+  },
+  {
+    "key": "alt+down",
+    "command": "-editor.action.smartSelect.shrink",
+    "when": "editorTextFocus && resourceExtname =~ /^(\\.js|\\.jsx|\\.cjs|\\.mjs|\\.ts|\\.tsx|\\.cts|\\.mts|\\.vue)$/"
+  },
+  {
+    "key": "alt+up",
+    "command": "-editor.action.smartSelect.expand",
+    "when": "editorTextFocus && resourceExtname =~ /^(\\.js|\\.jsx|\\.cjs|\\.mjs|\\.ts|\\.tsx|\\.cts|\\.mts|\\.vue)$/"
+  },
+  {
+    "key": "cmd+i",
+    "command": "-workbench.view.extension.phind-webview"
+  },
+  {
+    "key": "shift+alt+cmd+e",
+    "command": "-copilot-labs.use-brush-picker",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "alt+\\",
+    "command": "-editor.action.inlineSuggest.trigger",
+    "when": "config.github.copilot.inlineSuggest.enable && editorTextFocus && !editorHasSelection && !inlineSuggestionsVisible"
+  },
+  {
+    "key": "ctrl+alt+cmd+l",
+    "command": "editor.action.selectHighlights",
+    "when": "editorFocus"
+  },
+  {
+    "key": "shift+cmd+l",
+    "command": "-editor.action.selectHighlights",
+    "when": "editorFocus"
+  },
+  {
+    "key": "cmd+;",
+    "command": "expandLineSelection",
+    "when": "textInputFocus"
+  },
+  {
+    "key": "cmd+p",
+    "command": "-expandLineSelection",
+    "when": "textInputFocus"
+  },
+  {
+    "key": "shift+cmd+l",
+    "command": "-selectAllSearchEditorMatches",
+    "when": "inSearchEditor"
+  },
+  {
+    "key": "shift+cmd+l",
+    "command": "-addCursorsAtSearchResults",
+    "when": "fileMatchOrMatchFocus && searchViewletVisible"
+  },
+  {
+    "key": "shift+cmd+l",
+    "command": "-aichat.insertselectionintochat"
+  },
+  {
+    "key": "alt+cmd+b",
+    "command": "-workbench.action.toggleAuxiliaryBar"
+  },
+  {
+    "key": "cmd+]",
+    "command": "workbench.action.toggleAuxiliaryBar"
+  },
+  {
+    "key": "shift+enter",
+    "command": "workbench.action.terminal.sendSequence",
+    "args": {
+      "text": "\\\r\n"
+    },
+    "when": "terminalFocus"
+  },
+  {
+    "key": "alt+cmd+k",
+    "command": "-keybindings.editor.recordSearchKeys",
+    "when": "inKeybindings && inKeybindingsSearch"
+  },
+  {
+    "key": "alt+cmd+k",
+    "command": "claude-code.insertAtMentioned",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "alt+cmd+k",
+    "command": "-claude-code.insertAtMentioned",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "cmd+i",
+    "command": "composerMode.agent"
+  },
+  {
+    "key": "cmd+l",
+    "command": "composerMode.chat"
+  },
+  {
+    "key": "cmd+b",
+    "command": "-markdown.extension.editing.toggleBold",
+    "when": "editorTextFocus && !editorReadonly && editorLangId =~ /^markdown$|^rmd$|^quarto$/"
+  },
+  {
+    "key": "ctrl+alt+cmd+c",
+    "command": "claude-vscode.sidebar.open"
+  },
+  {
+    "key": "ctrl+alt+cmd+t",
+    "command": "claude-vscode.terminal.open"
+  },
+  {
+    "key": "cmd+e",
+    "command": "-editor.action.toggleScreenReaderAccessibilityMode",
+    "when": "accessibilityHelpIsShown"
+  },
+  {
+    "key": "shift+alt+f1",
+    "command": "-editor.action.toggleScreenReaderAccessibilityMode"
+  }
+]

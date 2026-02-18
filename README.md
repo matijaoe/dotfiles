@@ -29,6 +29,7 @@ dots run symlinks                # create config symlinks
 dots run dock                    # apply Dock layout
 dots run macos                   # apply macOS system defaults
 dots run claude                  # setup Claude Code configs
+dots run cursor                  # restore Cursor settings
 dots run curl                    # install curl-based tools
 ```
 
@@ -57,15 +58,16 @@ Profile is resolved in order:
 | 2   | Homebrew          |                     |                                  |
 | 3   | Zinit             |                     |                                  |
 | 4   | Profile detection |                     | prompts if no profile set        |
-| 5   | Brew packages     | `dots run brew`     |                                  |
+| 5   | Brew packages     | `dots run brew`     | incl. Cursor extensions          |
 | 6   | Symlinks          | `dots run symlinks` | shell, git, ssh, claude, editors |
-| 7   | Node (via n)      |                     |                                  |
-| 8   | npm globals       |                     |                                  |
-| 9   | pnpm globals      |                     |                                  |
-| 10  | Curl tools        | `dots run curl`     |                                  |
-| 11  | mise              |                     | work profile only                |
-| 12  | macOS defaults    | `dots run macos`    |                                  |
-| 13  | Dock layout       | `dots run dock`     |                                  |
+| 7   | Cursor            | `dots run cursor`   | copied, not symlinked            |
+| 8   | Node (via n)      |                     |                                  |
+| 9   | npm globals       |                     |                                  |
+| 10  | pnpm globals      |                     |                                  |
+| 11  | Curl tools        | `dots run curl`     |                                  |
+| 12  | mise              |                     | work profile only                |
+| 13  | macOS defaults    | `dots run macos`    |                                  |
+| 14  | Dock layout       | `dots run dock`     |                                  |
 
 ## Save flow
 
@@ -78,4 +80,6 @@ Profile is resolved in order:
 | 3   | Dump Dock pinned apps | `packages/dock/<profile>.txt`      |
 | 4   | Dump npm globals      | `packages/npm-globals.txt`         |
 | 5   | Dump pnpm globals     | `packages/pnpm-globals.txt`        |
-| 6   | Git commit + push     | prompts y/N                        |
+| 6   | Copy Cursor settings  | `config/cursor/settings.json`      |
+| 7   | Copy Cursor keybinds  | `config/cursor/keybindings.json`   |
+| 8   | Git commit + push     | prompts y/N                        |

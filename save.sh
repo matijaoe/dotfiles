@@ -37,7 +37,7 @@ info "Snapshotting..."
 mkdir -p "$DOTFILES/packages/brew/$PROFILE"
 if command_exists brew; then
   gum spin --spinner dot --title "Brew packages..." -- \
-    brew bundle dump --describe --no-vscode --force --file="$DOTFILES/packages/brew/$PROFILE/Brewfile"
+    brew bundle dump --describe --force --file="$DOTFILES/packages/brew/$PROFILE/Brewfile"
   success "Brewfile"
 else
   warn "brew not found — skipping"
@@ -99,6 +99,18 @@ for store in data:
     _pnpm_tmp=""
     warn "pnpm globals — failed to dump, keeping existing"
   fi
+fi
+
+# Cursor (copy-based — Cursor overwrites symlinks on save; extensions tracked via Brewfile)
+CURSOR_USER="$HOME/Library/Application Support/Cursor/User"
+if command_exists cursor; then
+  mkdir -p "$DOTFILES/config/cursor"
+  cp "$CURSOR_USER/settings.json" "$DOTFILES/config/cursor/settings.json" 2>/dev/null && \
+    success "Cursor settings" || warn "Cursor settings.json not found"
+  cp "$CURSOR_USER/keybindings.json" "$DOTFILES/config/cursor/keybindings.json" 2>/dev/null && \
+    success "Cursor keybindings" || warn "Cursor keybindings.json not found"
+else
+  warn "cursor not found — skipping"
 fi
 
 # ============================================================

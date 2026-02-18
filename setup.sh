@@ -118,8 +118,19 @@ bash "$DOTFILES/scripts/brew-install.sh" "--$PROFILE"
 bash "$DOTFILES/scripts/symlinks.sh" "--$PROFILE"
 
 # ============================================================
-# 7. Node (n)
+# 7. Cursor (copy-based — Cursor overwrites symlinks on save)
 # ============================================================
+if command_exists cursor; then
+  bash "$DOTFILES/scripts/cursor-setup.sh"
+else
+  section "Cursor"
+  warn "cursor not found — install via brew first"
+fi
+
+# ============================================================
+# 8. Node (n)
+# ============================================================
+
 section "Node"
 # n needs N_PREFIX set to install to ~/.n instead of /usr/local
 export N_PREFIX="$HOME/.n"
@@ -166,7 +177,7 @@ else
 fi
 
 # ============================================================
-# 8. npm global packages
+# 9. npm global packages
 # ============================================================
 section "npm globals"
 NPM_TOTAL=0
@@ -217,7 +228,7 @@ else
 fi
 
 # ============================================================
-# 9. pnpm global packages
+# 10. pnpm global packages
 # ============================================================
 section "pnpm globals"
 PNPM_TOTAL=0
@@ -282,12 +293,12 @@ else
 fi
 
 # ============================================================
-# 10. Curl-installed tools (self-updating)
+# 11. Curl-installed tools (self-updating)
 # ============================================================
 bash "$DOTFILES/scripts/curl-tools.sh"
 
 # ============================================================
-# 11. mise (work profile only)
+# 12. mise (work profile only)
 # ============================================================
 section "mise"
 if [[ "$PROFILE" == "work" ]] && command_exists mise; then
@@ -301,7 +312,7 @@ else
 fi
 
 # ============================================================
-# 12. macOS defaults
+# 13. macOS defaults
 # ============================================================
 section "macOS defaults"
 if [[ -f "$DOTFILES/scripts/macos-defaults.sh" ]]; then
@@ -313,7 +324,7 @@ else
 fi
 
 # ============================================================
-# 13. Dock
+# 14. Dock
 # ============================================================
 if command_exists dockutil; then
   bash "$DOTFILES/scripts/dock-apply.sh" "--$PROFILE"

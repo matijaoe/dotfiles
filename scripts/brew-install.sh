@@ -35,9 +35,9 @@ UPGRADING=0
 PENDING_ACTION=""  # tracks current install/upgrade in progress
 
 # Count Brewfile entries by type
-BREW_COUNT=$(grep -c '^brew ' "$BREWFILE" 2>/dev/null || echo 0)
-CASK_COUNT=$(grep -c '^cask ' "$BREWFILE" 2>/dev/null || echo 0)
-VSCODE_COUNT=$(grep -c '^vscode ' "$BREWFILE" 2>/dev/null || echo 0)
+BREW_COUNT=$(grep -c '^brew ' "$BREWFILE" 2>/dev/null) || BREW_COUNT=0
+CASK_COUNT=$(grep -c '^cask ' "$BREWFILE" 2>/dev/null) || CASK_COUNT=0
+VSCODE_COUNT=$(grep -c '^vscode ' "$BREWFILE" 2>/dev/null) || VSCODE_COUNT=0
 
 # Finish a pending install/upgrade action with a permanent ✓ line
 flush_pending() {
@@ -77,9 +77,13 @@ if [[ "$INSTALLING" -gt 0 || "$UPGRADING" -gt 0 ]]; then
   [[ "$INSTALLING" -gt 0 ]] && PARTS+=("$INSTALLING installed")
   [[ "$UPGRADING" -gt 0 ]] && PARTS+=("$UPGRADING upgraded")
   JOIN=$(IFS=,; echo "${PARTS[*]}" | sed 's/,/, /g')
-  summary "$JOIN — $BREW_COUNT formulae, $CASK_COUNT casks, $VSCODE_COUNT extensions"
+  BREAKDOWN="$BREW_COUNT formulae, $CASK_COUNT casks"
+  [[ "$VSCODE_COUNT" -gt 0 ]] && BREAKDOWN+=", $VSCODE_COUNT extensions"
+  summary "$JOIN — $BREAKDOWN"
 else
-  summary "$BREW_COUNT formulae, $CASK_COUNT casks, $VSCODE_COUNT extensions up to date"
+  BREAKDOWN="$BREW_COUNT formulae, $CASK_COUNT casks"
+  [[ "$VSCODE_COUNT" -gt 0 ]] && BREAKDOWN+=", $VSCODE_COUNT extensions"
+  summary "$BREAKDOWN up to date"
 fi
 
 # Configure autoupdate

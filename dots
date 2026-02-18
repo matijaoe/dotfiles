@@ -71,6 +71,7 @@ BANNER
 | **dock** | Apply Dock layout |
 | **macos** | Apply macOS defaults |
 | **claude** | Setup Claude Code configs |
+| **cursor** | Restore Cursor settings and keybindings |
 | **curl** | Install curl-based tools |
 
 ## Profiles
@@ -94,6 +95,7 @@ HELP
     "dots run dock --work   |# apply work Dock layout"
     "dots run macos         |# apply macOS defaults"
     "dots run claude        |# setup Claude Code configs"
+    "dots run cursor        |# restore Cursor settings"
     "dots run curl          |# install curl-based tools"
   )
   for line in "${examples[@]}"; do
@@ -123,6 +125,7 @@ Scripts:
   dock       Apply Dock layout
   macos      Apply macOS defaults
   claude     Setup Claude Code configs
+  cursor     Restore Cursor settings and keybindings
   curl       Install curl-based tools
 
 Profiles: personal, work
@@ -136,6 +139,7 @@ Examples:
   dots run dock --work    # apply work Dock layout
   dots run macos          # apply macOS defaults
   dots run claude         # setup Claude Code configs
+  dots run cursor         # restore Cursor settings
   dots run curl           # install curl-based tools
 
 EOF
@@ -169,6 +173,9 @@ case "$COMMAND" in
         ;;
       claude)
         exec "$DOTFILES/scripts/claude-setup.sh" "$@"
+        ;;
+      cursor)
+        exec "$DOTFILES/scripts/cursor-setup.sh" "$@"
         ;;
       macos)
         source "$DOTFILES/scripts/lib/common.sh"

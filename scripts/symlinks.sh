@@ -32,13 +32,14 @@ link_file() {
   fi
 }
 
-# Print group name: dim if all linked, success if something was created
+# Print group name with optional profile tag
+# Usage: end_group "Name" or end_group "Name" "$PROFILE"
 end_group() {
-  if [[ "$GROUP_CREATED" -eq 0 ]]; then
-    success "$1"
-  else
-    success "$1"
+  local label="$1"
+  if [[ -n "${2:-}" ]]; then
+    label="$1 \033[1;33m[$2]\033[0m"
   fi
+  printf "  \033[32m✓\033[0m $label\n"
   GROUP_CREATED=0
 }
 
@@ -56,7 +57,7 @@ end_group "Git"
 
 # SSH
 link_file "$DOTFILES/config/ssh/config.$PROFILE"   "$HOME/.ssh/config"
-end_group "SSH ($PROFILE)"
+end_group "SSH" "$PROFILE"
 
 # Starship
 link_file "$DOTFILES/config/starship.toml"         "$HOME/.config/starship.toml"
@@ -93,6 +94,8 @@ for agent in "$DOTFILES/config/claude/agents/"*.md; do
   link_file "$agent" "$HOME/.claude/agents/$(basename "$agent")"
 done
 end_group "Claude Code"
+
+# Cursor — not symlinked (Cursor overwrites symlinks on save); copied by setup.sh/save.sh instead
 
 # dots CLI
 link_file "$DOTFILES/dots" "$HOME/.local/bin/dots"

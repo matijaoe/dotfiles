@@ -44,6 +44,7 @@ link_file() {
 }
 
 section "Claude Code"
+info "Symlinking configs..."
 
 # Settings
 link_file "$CLAUDE_SRC/settings.json" "$CLAUDE_DEST/settings.json"
