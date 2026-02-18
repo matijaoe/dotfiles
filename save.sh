@@ -37,7 +37,7 @@ info "Snapshotting..."
 mkdir -p "$DOTFILES/packages/brew/$PROFILE"
 if command_exists brew; then
   gum spin --spinner dot --title "Brew packages..." -- \
-    brew bundle dump --describe --force --file="$DOTFILES/packages/brew/$PROFILE/Brewfile"
+    brew bundle dump --describe --no-vscode --force --file="$DOTFILES/packages/brew/$PROFILE/Brewfile"
   success "Brewfile"
 else
   warn "brew not found — skipping"

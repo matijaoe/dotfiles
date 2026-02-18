@@ -47,7 +47,7 @@ link_file "$DOTFILES/config/shell/.zshrc"          "$HOME/.zshrc"
 link_file "$DOTFILES/config/shell/.zsh_plugins.txt"  "$HOME/.zsh_plugins.txt"
 link_file "$DOTFILES/config/shell/aliases"         "$HOME/.config/shell/aliases"
 link_file "$DOTFILES/config/shell/completions"     "$HOME/.config/shell/completions"
-end_group "Shell"
+end_group "Shell (zsh + antidote)"
 
 # Git
 link_file "$DOTFILES/config/git/.gitconfig"        "$HOME/.gitconfig"
@@ -75,7 +75,7 @@ end_group "Micro"
 # GitHub
 link_file "$DOTFILES/config/gh/config.yml"         "$HOME/.config/gh/config.yml"
 link_file "$DOTFILES/config/gh-dash/config.yml"    "$HOME/.config/gh-dash/config.yml"
-end_group "GitHub"
+end_group "GitHub CLI"
 
 # OpenCode
 link_file "$DOTFILES/config/opencode/opencode.json" "$HOME/.config/opencode/opencode.json"
