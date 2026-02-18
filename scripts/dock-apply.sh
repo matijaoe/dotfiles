@@ -54,6 +54,7 @@ CURRENT=$(dockutil --list 2>/dev/null \
 
 # Compare — skip if already correct (same apps, same order)
 if [[ "$CURRENT" == "$DESIRED" ]]; then
+  info "Dock matches config"
   for name in "${APP_NAMES[@]}"; do
     success "$name"
   done
@@ -65,8 +66,8 @@ fi
 # Disable "Show suggested and recent apps in Dock" to prevent re-injection
 defaults write com.apple.dock show-recents -bool false 2>/dev/null || true
 
-# Clear the dock
-info "Applying dock layout..."
+# Clear the dock and apply layout
+info "Applying layout..."
 defaults write com.apple.dock persistent-apps -array
 defaults write com.apple.dock persistent-others -array
 defaults write com.apple.dock recent-apps -array 2>/dev/null || true
