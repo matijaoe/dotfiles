@@ -45,6 +45,6 @@ else
   git clone "$DOTFILES_REPO" "$DOTFILES_DIR"
 fi
 
-# Hand off to setup
+# Hand off to setup (reattach stdin to terminal for interactive prompts)
 info "Starting setup..."
-exec "$DOTFILES_DIR/setup.sh" "$@"
+exec "$DOTFILES_DIR/setup.sh" "$@" </dev/tty

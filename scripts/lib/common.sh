@@ -57,7 +57,8 @@ confirm() {
   else
     local reply
     printf "%s [y/N] " "$prompt"
-    read -r reply
+    read -n 1 -r reply
+    echo
     [[ "$reply" =~ ^[Yy]$ ]]
   fi
 }

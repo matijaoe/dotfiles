@@ -2,6 +2,9 @@
 
 set -euo pipefail
 
+# Ensure stdin is connected to terminal (needed when piped via curl | bash)
+[[ ! -t 0 ]] && exec </dev/tty
+
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/scripts/lib/common.sh"
 
 NPM_INSTALLED_FILE=""
