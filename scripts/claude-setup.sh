@@ -20,10 +20,7 @@ link_file() {
 
   # Check if this would override an existing non-symlinked file
   if [[ -e "$dest" && ! -L "$dest" ]] || [[ -L "$dest" && "$(readlink "$dest")" != "$src" ]]; then
-    local reply
-    printf "  %s exists and differs — override? [y/N] " "$name"
-    read -r reply
-    if [[ ! "$reply" =~ ^[Yy]$ ]]; then
+    if ! confirm "$name exists and differs — override?"; then
       info "$name (skipped)"
       return
     fi

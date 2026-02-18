@@ -120,10 +120,7 @@ info "Changes detected:"
 git status --short
 echo ""
 
-read -p "Commit and push? [y/N] " -n 1 -r
-echo ""
-
-if [[ $REPLY =~ ^[Yy]$ ]]; then
+if confirm "Commit and push?"; then
   git add -A
   git commit -m "save: $(date '+%Y-%m-%d %H:%M')"
   if ! git push; then

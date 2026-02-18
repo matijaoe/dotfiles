@@ -43,6 +43,8 @@ brew "git-delta"
 brew "gitui"
 # Render markdown on the CLI
 brew "glow"
+# Tool for glamorous shell scripts
+brew "gum"
 # Open source programming language to build simple/reliable/efficient software
 brew "go"
 # Improved top (interactive process viewer)

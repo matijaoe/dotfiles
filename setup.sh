@@ -6,10 +6,12 @@ source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/scripts/lib/common.sh"
 
 NPM_INSTALLED_FILE=""
 PNPM_INSTALLED_FILE=""
+GUM_TMP=""
 
 cleanup() {
   [[ -n "${NPM_INSTALLED_FILE:-}" && -f "$NPM_INSTALLED_FILE" ]] && rm -f "$NPM_INSTALLED_FILE"
   [[ -n "${PNPM_INSTALLED_FILE:-}" && -f "$PNPM_INSTALLED_FILE" ]] && rm -f "$PNPM_INSTALLED_FILE"
+  [[ -n "${GUM_TMP:-}" && -d "$GUM_TMP" ]] && rm -rf "$GUM_TMP"
 }
 trap cleanup EXIT
 
@@ -27,6 +29,26 @@ for arg in "$@"; do
 done
 
 # ============================================================
+# 0. Bootstrap gum (pretty terminal output)
+# ============================================================
+if ! has_gum; then
+  GUM_VERSION="0.17.0"
+  GUM_TMP="$(mktemp -d)"
+  _arch="$(uname -m)"
+  _tarball="gum_${GUM_VERSION}_Darwin_${_arch}.tar.gz"
+  _url="https://github.com/charmbracelet/gum/releases/download/v${GUM_VERSION}/${_tarball}"
+
+  if curl -fsSL "$_url" | tar xz -C "$GUM_TMP" 2>/dev/null; then
+    _gum_bin="$(find "$GUM_TMP" -name gum -type f | head -1)"
+    if [[ -n "$_gum_bin" ]]; then
+      chmod +x "$_gum_bin"
+      export PATH="$(dirname "$_gum_bin"):$PATH"
+    fi
+  fi
+  unset _arch _tarball _url _gum_bin
+fi
+
+# ============================================================
 # 1. Xcode Command Line Tools
 # ============================================================
 section "Xcode Command Line Tools"
@@ -34,9 +56,15 @@ if xcode-select -p &>/dev/null; then
   success "Already installed"
 else
   info "Installing (this may take a few minutes)..."
-  xcode-select --install
-  echo "Press any key when the installation is complete..."
-  read -n 1 -s
+  xcode-select --install 2>/dev/null || true
+  if has_gum; then
+    gum spin --spinner dot --title "Waiting for Xcode CLT installation..." -- \
+      bash -c 'until xcode-select -p &>/dev/null; do sleep 5; done'
+  else
+    echo "Press any key when the installation is complete..."
+    read -n 1 -s
+  fi
+  success "Done"
 fi
 
 # ============================================================
@@ -66,7 +94,12 @@ if [[ -d "$ZINIT_HOME" ]]; then
 else
   info "Installing Zinit..."
   mkdir -p "$(dirname "$ZINIT_HOME")"
-  git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+  if has_gum; then
+    gum spin --spinner dot --title "Cloning Zinit..." -- \
+      git clone --quiet https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+  else
+    git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
+  fi
   success "Done"
 fi
 
@@ -79,10 +112,8 @@ if [[ -z "$PROFILE" ]]; then
   if [[ -n "$PROFILE" ]]; then
     info "Using saved profile: $PROFILE"
   else
-    echo "Select profile:"
-    select PROFILE in "work" "personal"; do
-      [[ -n "$PROFILE" ]] && break
-    done
+    info "Select profile:"
+    PROFILE=$(choose_one "work" "personal")
   fi
 fi
 success "Profile: $PROFILE"
@@ -114,9 +145,17 @@ if command_exists n; then
     success "Node already installed: $(node --version)"
   else
     info "Installing Node LTS..."
-    n lts
+    if has_gum; then
+      gum spin --spinner dot --title "Installing Node LTS..." -- n lts
+    else
+      n lts
+    fi
     info "Installing Node latest..."
-    n latest
+    if has_gum; then
+      gum spin --spinner dot --title "Installing Node latest..." -- n latest
+    else
+      n latest
+    fi
   fi
 else
   warn "n not found — should be installed via brew in step 5"
@@ -213,8 +252,13 @@ bash "$DOTFILES/scripts/curl-tools.sh"
 # ============================================================
 section "mise"
 if [[ "$PROFILE" == "work" ]] && command_exists mise; then
-  info "Installing work tools..."
-  mise use --global awscli kubectl sops &>/dev/null
+  if has_gum; then
+    gum spin --spinner dot --title "Installing work tools..." -- \
+      mise use --global awscli kubectl sops
+  else
+    info "Installing work tools..."
+    mise use --global awscli kubectl sops &>/dev/null
+  fi
   success "awscli, kubectl, sops"
 elif [[ "$PROFILE" == "work" ]]; then
   warn "mise not found — should be installed via brew in step 5"
@@ -227,7 +271,12 @@ fi
 # ============================================================
 section "macOS defaults"
 if [[ -f "$DOTFILES/scripts/macos-defaults.sh" ]]; then
-  bash "$DOTFILES/scripts/macos-defaults.sh" &>/dev/null
+  if has_gum; then
+    gum spin --spinner dot --title "Applying macOS defaults..." -- \
+      bash "$DOTFILES/scripts/macos-defaults.sh"
+  else
+    bash "$DOTFILES/scripts/macos-defaults.sh" &>/dev/null
+  fi
   success "Applied — some changes require restart"
 else
   warn "scripts/macos-defaults.sh not found"
@@ -247,7 +296,11 @@ fi
 # Summary
 # ============================================================
 echo ""
-printf "\033[1;32m✓ Setup complete!\033[0m\n"
+if has_gum; then
+  gum style --bold --foreground 2 "✓ Setup complete!"
+else
+  printf "\033[1;32m✓ Setup complete!\033[0m\n"
+fi
 
 # Post-setup checks
 section "Manual steps"

@@ -19,22 +19,37 @@ if [[ ! -f "$BREWFILE" ]]; then
   exit 1
 fi
 
-_brew_tmp=$(mktemp)
-brew bundle --file="$BREWFILE" > "$_brew_tmp" 2>&1 || true
+# Spinner characters — each "Using" line advances the spinner
+_SPIN=("⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏")
+_SPIN_IDX=0
 
-# Show only installs and upgrades with proper formatting
+USING=0
+INSTALLING=0
+UPGRADING=0
+
+# Stream brew bundle output for real-time feedback
 while IFS= read -r line; do
-  if [[ "$line" =~ ^Installing[[:space:]](.+) ]]; then
+  if [[ "$line" =~ ^Using[[:space:]](.+) ]]; then
+    ((USING++)) || true
+    if has_gum; then
+      # Transient line: show spinner + package name, overwrites itself
+      printf "\r\033[K  \033[2m%s %s\033[0m" "${_SPIN[$_SPIN_IDX]}" "${BASH_REMATCH[1]}"
+      _SPIN_IDX=$(( (_SPIN_IDX + 1) % ${#_SPIN[@]} ))
+    fi
+  elif [[ "$line" =~ ^Installing[[:space:]](.+) ]]; then
+    ((INSTALLING++)) || true
+    # Clear transient spinner line before printing permanent output
+    has_gum && printf "\r\033[K"
     info "Installing ${BASH_REMATCH[1]}..."
   elif [[ "$line" =~ ^Upgrading[[:space:]](.+) ]]; then
+    ((UPGRADING++)) || true
+    has_gum && printf "\r\033[K"
     info "Upgrading ${BASH_REMATCH[1]}..."
   fi
-done < "$_brew_tmp"
+done < <(brew bundle --file="$BREWFILE" 2>&1 || true)
 
-USING=$(grep -cE "^Using " "$_brew_tmp" || true)
-INSTALLING=$(grep -cE "^Installing " "$_brew_tmp" || true)
-UPGRADING=$(grep -cE "^Upgrading " "$_brew_tmp" || true)
-rm -f "$_brew_tmp"
+# Clear any remaining spinner line
+has_gum && printf "\r\033[K"
 
 if [[ "$INSTALLING" -eq 0 && "$UPGRADING" -eq 0 ]]; then
   success "$USING packages up to date"
@@ -47,7 +62,12 @@ HOURS=$((BREW_AUTOUPDATE_INTERVAL / 3600))
 if brew autoupdate status 2>/dev/null | grep -q "installed and running"; then
   success "Autoupdate running (every ${HOURS}h)"
 else
-  info "Configuring autoupdate (every ${HOURS}h)..."
-  brew autoupdate start "$BREW_AUTOUPDATE_INTERVAL" --upgrade --cleanup &>/dev/null
+  if has_gum; then
+    gum spin --spinner dot --title "Configuring autoupdate (every ${HOURS}h)..." -- \
+      brew autoupdate start "$BREW_AUTOUPDATE_INTERVAL" --upgrade --cleanup
+  else
+    info "Configuring autoupdate (every ${HOURS}h)..."
+    brew autoupdate start "$BREW_AUTOUPDATE_INTERVAL" --upgrade --cleanup &>/dev/null
+  fi
   success "Autoupdate configured"
 fi
