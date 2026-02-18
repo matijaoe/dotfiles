@@ -101,18 +101,6 @@ for store in data:
   fi
 fi
 
-# Cursor (copy-based — Cursor overwrites symlinks on save; extensions tracked via Brewfile)
-CURSOR_USER="$HOME/Library/Application Support/Cursor/User"
-if command_exists cursor; then
-  mkdir -p "$DOTFILES/config/cursor"
-  cp "$CURSOR_USER/settings.json" "$DOTFILES/config/cursor/settings.json" 2>/dev/null && \
-    success "Cursor settings" || warn "Cursor settings.json not found"
-  cp "$CURSOR_USER/keybindings.json" "$DOTFILES/config/cursor/keybindings.json" 2>/dev/null && \
-    success "Cursor keybindings" || warn "Cursor keybindings.json not found"
-else
-  warn "cursor not found — skipping"
-fi
-
 # ============================================================
 # 3. Git commit + push
 # ============================================================

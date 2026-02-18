@@ -1,0 +1,26 @@
+# Mac App Store apps — personal profile only
+# Format: <app-id>  # <app-name>
+# Find IDs with: mas search <name>  or  https://apps.apple.com (number in URL)
+
+361304891   # Numbers
+1569813296  # 1Password for Safari
+1320666476  # Wipr
+1569600264  # Pandan
+1522267256  # Shareful
+1596706466  # Speediness
+1586435171  # Actions
+1572202501  # Plain Text Editor
+1153157709  # Speedtest by Ookla
+1355679052  # Dropover
+1593408455  # Anybox
+963034692   # Streaks
+6444068649  # Codepoint
+897283731   # Strongbox
+6475002485  # Reeder
+1668083311  # Whisper Transcription
+1358823008  # Flighty
+1346247457  # Endel
+6714467650  # Perplexity
+1141688067  # Coin Tick
+1608793370  # Magic Disk Benchmark
+1450640351  # Lightweight PDF

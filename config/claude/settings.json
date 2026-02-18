@@ -201,7 +201,7 @@
     ],
     "defaultMode": "acceptEdits"
   },
-  "model": "opus[1m]",
+  "model": "sonnet[1m]",
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "context7"
@@ -266,5 +266,9 @@
   },
   "alwaysThinkingEnabled": true,
   "autoUpdatesChannel": "latest",
-  "showTurnDuration": true
+  "skipDangerousModePermissionPrompt": true,
+  "showTurnDuration": true,
+  "terminal": {
+    "lineHeight": 1.3
+  }
 }

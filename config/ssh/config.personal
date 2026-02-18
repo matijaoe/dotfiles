@@ -1,14 +1,53 @@
 Host *
   SetEnv TERM=xterm-256color
+  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
 
 # GitHub
 Host github
   HostName github.com
   User git
-  IdentityFile ~/.ssh/key-github
-  IdentitiesOnly yes
 
-Host *
-  IdentityAgent "~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+# GitLab
+Host gitlab
+  HostName gitlab.com
+  User git
 
-# Personal SSH hosts below
+# Gitea
+Host gitea
+  HostName gitea.home
+  User git
+  Port 3001
+
+# ultra.cc
+Host ultra
+  HostName unless.aglaia.usbx.me
+  User unless
+  Compression yes
+
+# Umbrel (local network)
+Host umbrel
+  HostName umbrel.local
+  User umbrel
+
+# Homelab (Tailscale - primary)
+Host homelab
+  HostName homelab
+  User matijao
+
+# Homelab fallback (LAN)
+Host homelab-lan
+  HostName 192.168.1.219
+  User matijao
+
+# Tailscale IP (for this Mac)
+Host mac
+  HostName mbp-14
+  User matijao
+
+# This Mac (self)
+Host mac-local
+  HostName localhost
+  User matijao
+
+# OrbStack container overrides
+Include ~/.orbstack/ssh/config

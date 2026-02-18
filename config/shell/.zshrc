@@ -1,7 +1,13 @@
 # ============================================================
+# Homebrew (must be first — tools like starship, zoxide, mise live here)
+# ============================================================
+eval "$(/opt/homebrew/bin/brew shellenv)"
+
+# ============================================================
 # Completions
 # ============================================================
 fpath=(~/.config/shell/completions $fpath)
+[[ -d "$HOME/.zsh/completions" ]] && fpath=("$HOME/.zsh/completions" $fpath)
 
 # ============================================================
 # Antidote plugin manager
@@ -12,7 +18,7 @@ zstyle ':antidote:*' zcompile 'yes'
 zstyle ':antidote:bundle' use-friendly-names 'yes'
 
 zsh_plugins=${ZDOTDIR:-$HOME}/.zsh_plugins
-if [[ ! ${zsh_plugins}.zsh -nt ${zsh_plugins}.txt ]]; then
+if [[ ! -s ${zsh_plugins}.zsh || ! ${zsh_plugins}.zsh -nt ${zsh_plugins}.txt ]]; then
   (
     source /opt/homebrew/opt/antidote/share/antidote/antidote.zsh
     antidote bundle <${zsh_plugins}.txt >${zsh_plugins}.zsh
@@ -64,6 +70,7 @@ export VISUAL="$EDITOR"
 # ============================================================
 source "$HOME/.config/shell/aliases/eza.zsh"
 source "$HOME/.config/shell/aliases/custom.zsh"
+source "$HOME/.config/shell/aliases/personal-temp.zsh"
 source "$HOME/.config/shell/aliases/theydo.zsh"
 
 # ============================================================
@@ -90,7 +97,7 @@ path_prepend "$BUN_INSTALL/bin"
 path_prepend "$HOME/.local/bin"
 
 # mise — polyglot runtime manager
-eval "$(mise activate zsh)"
+command -v mise >/dev/null 2>&1 && eval "$(mise activate zsh)"
 
 # wt — git worktree tool shell integration
 if command -v wt >/dev/null 2>&1; then eval "$(command wt config shell init zsh)"; fi
@@ -102,6 +109,5 @@ path_prepend "$HOME/.opencode/bin"
 export PNPM_HOME="$HOME/Library/pnpm"
 path_prepend "$PNPM_HOME"
 
-# omnara
-export OMNARA_INSTALL="$HOME/.omnara"
-export PATH="$OMNARA_INSTALL/bin:$PATH"
+# deno
+[ -s "$HOME/.deno/env" ] && source "$HOME/.deno/env"

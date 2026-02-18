@@ -23,13 +23,11 @@ trap cleanup EXIT
 # Parse flags
 # ============================================================
 PROFILE=""
-FORCE_FLAG=""
 
 for arg in "$@"; do
   case "$arg" in
     --work)     PROFILE="work" ;;
     --personal) PROFILE="personal" ;;
-    -y)         FORCE_FLAG="-y" ;;
     *)          echo "Unknown flag: $arg"; exit 1 ;;
   esac
 done
@@ -110,9 +108,14 @@ printf "  \033[32m✓\033[0m Profile: \033[1;33m%s\033[0m\n" "$PROFILE"
 echo "$PROFILE" > "$HOME/.dotfiles-profile"
 
 # ============================================================
-# 5. Brew bundle
+# 4. Brew bundle
 # ============================================================
 bash "$DOTFILES/scripts/brew-install.sh" "--$PROFILE"
+
+# ============================================================
+# 5. Mac App Store (personal)
+# ============================================================
+bash "$DOTFILES/scripts/mas-install.sh" "--$PROFILE"
 
 # ============================================================
 # 6. Symlinks
@@ -120,13 +123,20 @@ bash "$DOTFILES/scripts/brew-install.sh" "--$PROFILE"
 bash "$DOTFILES/scripts/symlinks.sh" "--$PROFILE"
 
 # ============================================================
-# 7. Cursor (copy-based — Cursor overwrites symlinks on save)
+# 7. Antidote — bootstrap plugin bundle
 # ============================================================
-if command_exists cursor; then
-  bash "$DOTFILES/scripts/cursor-setup.sh" ${FORCE_FLAG:+"$FORCE_FLAG"}
+section "Antidote plugins"
+if [[ -f /opt/homebrew/opt/antidote/share/antidote/antidote.zsh && -f "$HOME/.zsh_plugins.txt" ]]; then
+  rm -f "$HOME/.zsh_plugins.zsh"
+  gum spin --spinner dot --title "Bundling zsh plugins..." -- \
+    zsh -c 'source /opt/homebrew/opt/antidote/share/antidote/antidote.zsh && antidote bundle < "$HOME/.zsh_plugins.txt" > "$HOME/.zsh_plugins.zsh"'
+  if [[ -s "$HOME/.zsh_plugins.zsh" ]]; then
+    success "Bundle generated"
+  else
+    warn "Bundle generation failed — will retry on next shell open"
+  fi
 else
-  section "Cursor"
-  warn "cursor not found — install via brew first"
+  warn "antidote not found — should be installed via brew in step 4"
 fi
 
 # ============================================================
@@ -140,42 +150,28 @@ export PATH="$N_PREFIX/bin:$PATH"
 mkdir -p "$N_PREFIX"
 
 if command_exists n; then
-  CURRENT_VER=$(node --version 2>/dev/null || echo "")
-  LTS_VER=$(n --lts 2>/dev/null || echo "")
-  LATEST_VER=$(n --latest 2>/dev/null || echo "")
+  # Always ensure latest and LTS are installed; activate LTS last so it becomes default
+  gum spin --spinner dot --title "Installing Node latest..." -- n latest
+  gum spin --spinner dot --title "Installing Node LTS..." -- n lts
 
-  if [[ -z "$CURRENT_VER" ]]; then
-    gum spin --spinner dot --title "Installing Node LTS..." -- n lts
-    gum spin --spinner dot --title "Installing Node latest..." -- n latest
-    n lts &>/dev/null
-    CURRENT_VER=$(node --version)
-    LTS_VER=$(n --lts)
-    LATEST_VER=$(n --latest)
-  fi
+  LTS_VER=$(n --lts 2>/dev/null || echo "?")
+  LATEST_VER=$(n --latest 2>/dev/null || echo "?")
 
-  # Mark which version is active with bold + arrow
-  _node_line() {
-    local ver="$1" tag="$2" is_default="$3"
-    if [[ "$is_default" == "true" ]]; then
-      printf "  \033[32m✓\033[0m \033[1m%s\033[0m (%s) ◂ default\n" "$ver" "$tag"
-    else
-      printf "  \033[32m✓\033[0m %s (%s)\n" "$ver" "$tag"
-    fi
-  }
-
-  if [[ "$CURRENT_VER" == "v$LTS_VER" ]]; then
-    _node_line "v$LTS_VER" "lts" "true"
-    _node_line "v$LATEST_VER" "latest" "false"
-  elif [[ "$CURRENT_VER" == "v$LATEST_VER" ]]; then
-    _node_line "v$LTS_VER" "lts" "false"
-    _node_line "v$LATEST_VER" "latest" "true"
-  else
-    _node_line "v$LTS_VER" "lts" "false"
-    _node_line "v$LATEST_VER" "latest" "false"
-    _node_line "$CURRENT_VER" "custom" "true"
-  fi
+  printf "  \033[32m✓\033[0m \033[1mv%s\033[0m (lts) ◂ active\n" "$LTS_VER"
+  printf "  \033[32m✓\033[0m v%s (latest)\n" "$LATEST_VER"
 else
-  warn "n not found — should be installed via brew in step 5"
+  warn "n not found — should be installed via brew in step 4"
+fi
+
+# Enable corepack (ships with Node — manages pnpm & yarn; npm manages itself)
+if command_exists npm; then
+  npm install --global corepack@latest &>/dev/null
+  corepack enable &>/dev/null
+  corepack prepare pnpm@latest --activate &>/dev/null
+  corepack prepare yarn@stable --activate &>/dev/null
+  success "corepack enabled ($(corepack --version 2>/dev/null || echo '?')) — pnpm + yarn pinned"
+else
+  warn "corepack not found — requires Node"
 fi
 
 # ============================================================
@@ -236,13 +232,10 @@ section "pnpm globals"
 PNPM_TOTAL=0
 PNPM_INSTALLED=0
 if command_exists pnpm && [[ -f "$DOTFILES/packages/pnpm-globals.txt" ]]; then
-  # Ensure PNPM_HOME is set up
+  # Ensure PNPM_HOME exists (.zshrc already exports the env vars)
   export PNPM_HOME="$HOME/Library/pnpm"
   export PATH="$PNPM_HOME:$PATH"
-  if [[ ! -d "$PNPM_HOME" ]]; then
-    info "Running pnpm setup..."
-    pnpm setup &>/dev/null
-  fi
+  mkdir -p "$PNPM_HOME"
   PNPM_LIST_READY=true
   PNPM_INSTALLED_FILE="$(mktemp)"
   if ! pnpm ls -g --depth=-1 --json 2>/dev/null | python3 -c '
@@ -308,7 +301,7 @@ if [[ "$PROFILE" == "work" ]] && command_exists mise; then
     mise use --global awscli kubectl sops
   success "awscli, kubectl, sops"
 elif [[ "$PROFILE" == "work" ]]; then
-  warn "mise not found — should be installed via brew in step 5"
+  warn "mise not found — should be installed via brew in step 4"
 else
   success "Skipped (not work profile)"
 fi
@@ -347,15 +340,13 @@ if ! command_exists op || ! op account list &>/dev/null 2>&1; then
   MANUAL_STEPS+=("1Password SSH Agent — Settings → Developer → enable SSH Agent")
 fi
 
-if [[ ! -f "$HOME/.ssh/key-github" ]]; then
-  MANUAL_STEPS+=("SSH key — export from 1Password or generate ~/.ssh/key-github")
-fi
-
 if [[ "$PROFILE" == "work" ]] && ! docker info &>/dev/null; then
   MANUAL_STEPS+=("Docker — open OrbStack to complete setup")
 fi
 
-MANUAL_STEPS+=("App Store — sign in and install apps from packages/apps.md")
+if [[ "$PROFILE" == "personal" ]]; then
+  MANUAL_STEPS+=("App Store — sign in to install MAS apps: dots run mas")
+fi
 
 if [[ ${#MANUAL_STEPS[@]} -gt 0 ]]; then
   echo ""

@@ -15,6 +15,7 @@ _dots() {
     'dock:Apply Dock layout'
     'claude:Setup Claude Code configs'
     'macos:Apply macOS system defaults'
+    'mas:Install Mac App Store apps (personal only)'
     'curl:Install curl-based tools'
   )
 

@@ -29,7 +29,7 @@ dots run symlinks                # create config symlinks
 dots run dock                    # apply Dock layout
 dots run macos                   # apply macOS system defaults
 dots run claude                  # setup Claude Code configs
-dots run cursor                  # restore Cursor settings
+dots run mas                     # install Mac App Store apps (personal only)
 dots run curl                    # install curl-based tools
 ```
 
@@ -38,7 +38,7 @@ dots run curl                    # install curl-based tools
 | Flag         | Includes                                   |
 | ------------ | ------------------------------------------ |
 | `--work`     | Work Brewfile, work SSH config, mise tools |
-| `--personal` | Personal Brewfile, personal SSH config     |
+| `--personal` | Personal Brewfile, personal SSH config, MAS apps |
 
 Profile-specific files live in subdirectories: `packages/brew/work/`, `packages/dock/work.txt`, `config/ssh/config.work`.
 
@@ -56,11 +56,11 @@ Profile is resolved in order:
 | --- | ----------------- | ------------------- | -------------------------------- |
 | 1   | Xcode CLI Tools   |                     |                                  |
 | 2   | Homebrew          |                     |                                  |
-| 3   | Antidote          |                     |                                  |
-| 4   | Profile detection |                     | prompts if no profile set        |
-| 5   | Brew packages     | `dots run brew`     | incl. Cursor extensions          |
+| 3   | Profile detection |                     | prompts if no profile set        |
+| 4   | Brew packages     | `dots run brew`     |                                  |
+| 5   | MAS apps          | `dots run mas`      | personal profile only            |
 | 6   | Symlinks          | `dots run symlinks` | shell, git, ssh, claude, editors |
-| 7   | Cursor            | `dots run cursor`   | diffs before applying; prompts if live changes would be lost; backs up on override |
+| 7   | Antidote plugins  |                     | bootstraps zsh plugin bundle     |
 | 8   | Node (via n)      |                     |                                  |
 | 9   | npm globals       |                     |                                  |
 | 10  | pnpm globals      |                     |                                  |
@@ -80,6 +80,4 @@ Profile is resolved in order:
 | 3   | Dump Dock pinned apps | `packages/dock/<profile>.txt`      |
 | 4   | Dump npm globals      | `packages/npm-globals.txt`         |
 | 5   | Dump pnpm globals     | `packages/pnpm-globals.txt`        |
-| 6   | Copy Cursor settings  | `config/cursor/settings.json`      |
-| 7   | Copy Cursor keybinds  | `config/cursor/keybindings.json`   |
-| 8   | Git commit + push     | prompts y/N                        |
+| 6   | Git commit + push     | prompts y/N                        |

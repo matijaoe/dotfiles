@@ -1,0 +1,3 @@
+@sourcegraph/amp
+ccexp
+trash-cli

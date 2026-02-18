@@ -75,7 +75,6 @@ end_group "Micro"
 
 # GitHub
 link_file "$DOTFILES/config/gh/config.yml"         "$HOME/.config/gh/config.yml"
-link_file "$DOTFILES/config/gh-dash/config.yml"    "$HOME/.config/gh-dash/config.yml"
 end_group "GitHub CLI"
 
 # OpenCode
@@ -94,8 +93,6 @@ for agent in "$DOTFILES/config/claude/agents/"*.md; do
   link_file "$agent" "$HOME/.claude/agents/$(basename "$agent")"
 done
 end_group "Claude Code"
-
-# Cursor — not symlinked (Cursor overwrites symlinks on save); copied by setup.sh/save.sh instead
 
 # dots CLI
 link_file "$DOTFILES/dots" "$HOME/.local/bin/dots"

@@ -32,7 +32,7 @@ fi
 alias clr="clear"
 alias q="~ && clear"
 alias path="echo ${PATH//:/$'\n'}"
-alias src="source ~/.zshrc"
+alias src="exec zsh"
 
 # Fix .. showing as red
 alias ".."="cd .." 
@@ -49,6 +49,7 @@ alias ghb="gh browse"
 # Navigation
 alias dl="~/Downloads"
 alias dt="~/Desktop"
+alias dc="~/Documents"
 alias dev="~/Developer"
 
 # Tools

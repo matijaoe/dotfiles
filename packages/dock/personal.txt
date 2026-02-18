@@ -1,0 +1,9 @@
+/Applications/Helium.app
+/Applications/Proton Mail.app
+/Applications/Ghostty.app
+/Applications/Cursor.app
+/Applications/ChatGPT.app
+/Applications/Claude.app
+/Applications/Perplexity.app
+/Applications/Notion.app
+/System/Applications/Notes.app
