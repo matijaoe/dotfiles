@@ -68,26 +68,37 @@ apply_file() {
     return
   fi
 
-  # Files differ — always show the diff (skip ---/+++ header, cap at 50 lines)
-  local diff_lines total_lines
-  diff_lines=$(echo "$diff_output" | tail -n +3)
-  total_lines=$(echo "$diff_lines" | wc -l | tr -d ' ')
+  # Check if live has anything that would be lost
+  # '-' lines = in live but not in dotfiles; '+' lines = additive (no risk)
+  local lost_lines
+  lost_lines=$(echo "$diff_output" | grep '^-[^-]' || true)
 
-  info "$filename differs:"
-  if [[ "$total_lines" -gt 50 ]]; then
-    echo "$diff_lines" | head -50
-    printf "  \033[2m... and %d more lines\033[0m\n" "$((total_lines - 50))"
+  if [[ -z "$lost_lines" ]]; then
+    # Purely additive — dotfiles just has more, nothing lost from live
+    cp "$src" "$dst"
+    success "$filename (updated)"
+    ((COPIED++)) || true
+    return
+  fi
+
+  # Live has data that would be lost — show it and ask
+  local lost_count
+  lost_count=$(echo "$lost_lines" | wc -l | tr -d ' ')
+
+  info "$filename: $lost_count line(s) in live would be lost:"
+  if [[ "$lost_count" -gt 30 ]]; then
+    echo "$lost_lines" | head -30
+    printf "  \033[2m... and %d more lines\033[0m\n" "$((lost_count - 30))"
   else
-    echo "$diff_lines"
+    echo "$lost_lines"
   fi
   echo ""
 
-  # Decide whether to override
   local do_copy=0
   if [[ "$FORCE" -eq 1 ]]; then
     do_copy=1
   else
-    confirm "Override $filename?" && do_copy=1 || true
+    confirm "Override $filename? (live changes will be lost)" && do_copy=1 || true
   fi
 
   if [[ "$do_copy" -eq 1 ]]; then

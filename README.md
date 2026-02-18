@@ -21,7 +21,7 @@ After setup, the `dots` CLI is available. Run `dots help` for full usage.
 ## Commands
 
 ```sh
-dots setup [--work|--personal]   # full system setup
+dots setup [--work|--personal] [-y]  # full system setup
 dots save                        # save current state to repo
 dots run <script> [profile]      # run individual script
 dots run brew                    # install Homebrew packages
@@ -60,7 +60,7 @@ Profile is resolved in order:
 | 4   | Profile detection |                     | prompts if no profile set        |
 | 5   | Brew packages     | `dots run brew`     | incl. Cursor extensions          |
 | 6   | Symlinks          | `dots run symlinks` | shell, git, ssh, claude, editors |
-| 7   | Cursor            | `dots run cursor`   | copied, not symlinked            |
+| 7   | Cursor            | `dots run cursor`   | diffs before applying; prompts if live changes would be lost; backs up on override |
 | 8   | Node (via n)      |                     |                                  |
 | 9   | npm globals       |                     |                                  |
 | 10  | pnpm globals      |                     |                                  |
