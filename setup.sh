@@ -93,6 +93,9 @@ fi
 # 3. Detect profile
 # ============================================================
 section "Profile"
+SAVED_PROFILE=""
+[[ -f "$HOME/.dotfiles-profile" ]] && SAVED_PROFILE="$(<"$HOME/.dotfiles-profile")"
+
 if [[ -z "$PROFILE" ]]; then
   PROFILE="$(resolve_profile)"
   if [[ -n "$PROFILE" ]]; then
@@ -100,6 +103,12 @@ if [[ -z "$PROFILE" ]]; then
   else
     info "Select profile:"
     PROFILE=$(choose_one "work" "personal")
+  fi
+elif [[ -n "$SAVED_PROFILE" && "$PROFILE" != "$SAVED_PROFILE" ]]; then
+  warn "Saved profile is \033[1;33m$SAVED_PROFILE\033[0m but you specified \033[1;33m$PROFILE\033[0m"
+  if ! confirm "Run setup as $PROFILE? This will overwrite your $SAVED_PROFILE config."; then
+    info "Aborted"
+    exit 0
   fi
 fi
 printf "  \033[32m✓\033[0m Profile: \033[1;33m%s\033[0m\n" "$PROFILE"
