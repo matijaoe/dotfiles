@@ -1,6 +1,7 @@
 #!/bin/bash
 
 # Shared helpers for scripts in this repository.
+# Requires: gum (https://github.com/charmbracelet/gum)
 
 if [[ -n "${DOTFILES_COMMON_SH_LOADED:-}" ]]; then
   return 0
@@ -11,7 +12,7 @@ DOTFILES="${DOTFILES:-$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)}"
 export DOTFILES
 
 # ============================================================
-# Gum detection
+# Gum detection (used by setup.sh bootstrap)
 # ============================================================
 has_gum() { command -v gum &>/dev/null; }
 
@@ -24,44 +25,21 @@ warn()    { printf "  \033[33m!\033[0m %s\n" "$1"; }
 error()   { printf "  \033[31m✗\033[0m %s\n" "$1"; }
 
 section() {
-  if has_gum; then
-    echo ""
-    gum style --bold --foreground 6 "➤ $1"
-  else
-    printf "\n\033[1;36m➤ %s\033[0m\n" "$1"
-  fi
+  echo ""
+  gum style --bold --foreground 6 "➤ $1"
 }
 
 command_exists() { command -v "$1" &>/dev/null; }
 
 # ============================================================
-# Interactive helpers (gum-enhanced with fallbacks)
+# Interactive helpers (gum-powered)
 # ============================================================
 
 # Choose from a list of options. Usage: choose_one "opt1" "opt2" ...
-choose_one() {
-  if has_gum; then
-    gum choose "$@"
-  else
-    select choice in "$@"; do
-      [[ -n "$choice" ]] && echo "$choice" && break
-    done
-  fi
-}
+choose_one() { gum choose "$@"; }
 
 # Yes/no confirmation. Usage: confirm "Commit and push?"
-confirm() {
-  local prompt="${1:-Continue?}"
-  if has_gum; then
-    gum confirm "$prompt"
-  else
-    local reply
-    printf "%s [y/N] " "$prompt"
-    read -n 1 -r reply
-    echo
-    [[ "$reply" =~ ^[Yy]$ ]]
-  fi
-}
+confirm() { gum confirm "${1:-Continue?}"; }
 
 # ============================================================
 # Profile helpers

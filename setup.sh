@@ -49,6 +49,12 @@ if ! has_gum; then
     fi
   fi
   unset _arch _tarball _url _gum_bin
+
+  if ! has_gum; then
+    echo "Failed to bootstrap gum — cannot continue without it."
+    echo "Install manually: brew install gum"
+    exit 1
+  fi
 fi
 
 # ============================================================
@@ -60,13 +66,8 @@ if xcode-select -p &>/dev/null; then
 else
   info "Installing (this may take a few minutes)..."
   xcode-select --install 2>/dev/null || true
-  if has_gum; then
-    gum spin --spinner dot --title "Waiting for Xcode CLT installation..." -- \
-      bash -c 'until xcode-select -p &>/dev/null; do sleep 5; done'
-  else
-    echo "Press any key when the installation is complete..."
-    read -n 1 -s
-  fi
+  gum spin --spinner dot --title "Waiting for Xcode CLT installation..." -- \
+    bash -c 'until xcode-select -p &>/dev/null; do sleep 5; done'
   success "Done"
 fi
 
@@ -97,12 +98,8 @@ if [[ -d "$ZINIT_HOME" ]]; then
 else
   info "Installing Zinit..."
   mkdir -p "$(dirname "$ZINIT_HOME")"
-  if has_gum; then
-    gum spin --spinner dot --title "Cloning Zinit..." -- \
-      git clone --quiet https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
-  else
-    git clone https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
-  fi
+  gum spin --spinner dot --title "Cloning Zinit..." -- \
+    git clone --quiet https://github.com/zdharma-continuum/zinit.git "$ZINIT_HOME"
   success "Done"
 fi
 
@@ -147,18 +144,9 @@ if command_exists n; then
   if command_exists node; then
     success "Node already installed: $(node --version)"
   else
-    info "Installing Node LTS..."
-    if has_gum; then
-      gum spin --spinner dot --title "Installing Node LTS..." -- n lts
-    else
-      n lts
-    fi
-    info "Installing Node latest..."
-    if has_gum; then
-      gum spin --spinner dot --title "Installing Node latest..." -- n latest
-    else
-      n latest
-    fi
+    gum spin --spinner dot --title "Installing Node LTS..." -- n lts
+    gum spin --spinner dot --title "Installing Node latest..." -- n latest
+    success "Node installed: $(node --version)"
   fi
 else
   warn "n not found — should be installed via brew in step 5"
@@ -255,13 +243,8 @@ bash "$DOTFILES/scripts/curl-tools.sh"
 # ============================================================
 section "mise"
 if [[ "$PROFILE" == "work" ]] && command_exists mise; then
-  if has_gum; then
-    gum spin --spinner dot --title "Installing work tools..." -- \
-      mise use --global awscli kubectl sops
-  else
-    info "Installing work tools..."
-    mise use --global awscli kubectl sops &>/dev/null
-  fi
+  gum spin --spinner dot --title "Installing work tools..." -- \
+    mise use --global awscli kubectl sops
   success "awscli, kubectl, sops"
 elif [[ "$PROFILE" == "work" ]]; then
   warn "mise not found — should be installed via brew in step 5"
@@ -274,12 +257,8 @@ fi
 # ============================================================
 section "macOS defaults"
 if [[ -f "$DOTFILES/scripts/macos-defaults.sh" ]]; then
-  if has_gum; then
-    gum spin --spinner dot --title "Applying macOS defaults..." -- \
-      bash "$DOTFILES/scripts/macos-defaults.sh"
-  else
-    bash "$DOTFILES/scripts/macos-defaults.sh" &>/dev/null
-  fi
+  gum spin --spinner dot --title "Applying macOS defaults..." -- \
+    bash "$DOTFILES/scripts/macos-defaults.sh"
   success "Applied — some changes require restart"
 else
   warn "scripts/macos-defaults.sh not found"
@@ -299,11 +278,7 @@ fi
 # Summary
 # ============================================================
 echo ""
-if has_gum; then
-  gum style --bold --foreground 2 "✓ Setup complete!"
-else
-  printf "\033[1;32m✓ Setup complete!\033[0m\n"
-fi
+gum style --bold --foreground 2 "✓ Setup complete!"
 
 # Post-setup checks
 section "Manual steps"
