@@ -101,7 +101,7 @@ if [[ -z "$PROFILE" ]]; then
     PROFILE=$(choose_one "work" "personal")
   fi
 fi
-success "Profile: $PROFILE"
+printf "  \033[32m✓\033[0m Profile: \033[1;33m%s\033[0m\n" "$PROFILE"
 echo "$PROFILE" > "$HOME/.dotfiles-profile"
 
 # ============================================================
@@ -137,16 +137,26 @@ if command_exists n; then
     LATEST_VER=$(n --latest)
   fi
 
+  # Mark which version is active with bold + arrow
+  _node_line() {
+    local ver="$1" tag="$2" is_default="$3"
+    if [[ "$is_default" == "true" ]]; then
+      printf "  \033[32m✓\033[0m \033[1m%s\033[0m (%s) ◂ default\n" "$ver" "$tag"
+    else
+      printf "  \033[32m✓\033[0m %s (%s)\n" "$ver" "$tag"
+    fi
+  }
+
   if [[ "$CURRENT_VER" == "v$LTS_VER" ]]; then
-    success "v$LTS_VER (lts, active)"
-    success "v$LATEST_VER (latest)"
+    _node_line "v$LTS_VER" "lts" "true"
+    _node_line "v$LATEST_VER" "latest" "false"
   elif [[ "$CURRENT_VER" == "v$LATEST_VER" ]]; then
-    success "v$LTS_VER (lts)"
-    success "v$LATEST_VER (latest, active)"
+    _node_line "v$LTS_VER" "lts" "false"
+    _node_line "v$LATEST_VER" "latest" "true"
   else
-    success "v$LTS_VER (lts)"
-    success "v$LATEST_VER (latest)"
-    success "$CURRENT_VER (active)"
+    _node_line "v$LTS_VER" "lts" "false"
+    _node_line "v$LATEST_VER" "latest" "false"
+    _node_line "$CURRENT_VER" "custom" "true"
   fi
 else
   warn "n not found — should be installed via brew in step 5"
