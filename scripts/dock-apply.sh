@@ -11,6 +11,7 @@ section "Dock"
 
 # Resolve profile
 PROFILE="$(require_profile "$@")"
+check_profile_conflict "$PROFILE"
 show_profile "$PROFILE" "$@"
 
 DOCK_FILE="$DOTFILES/packages/dock/${PROFILE}.txt"

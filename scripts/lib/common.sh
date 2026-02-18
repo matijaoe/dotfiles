@@ -65,6 +65,34 @@ confirm() {
 # Profile helpers
 # ============================================================
 
+# Check for profile conflict and confirm before proceeding.
+# Usage: check_profile_conflict "$PROFILE" [--saves-profile]
+#   --saves-profile: use when the caller will write ~/.dotfiles-profile (e.g. setup.sh)
+#                    omit for standalone scripts that only run once without changing saved profile
+check_profile_conflict() {
+  local profile="$1"
+  local saves_profile=false
+  [[ "${2:-}" == "--saves-profile" ]] && saves_profile=true
+
+  local saved=""
+  [[ -f "$HOME/.dotfiles-profile" ]] && saved="$(<"$HOME/.dotfiles-profile")"
+
+  # No conflict: no saved profile, or profiles match
+  [[ -z "$saved" || "$profile" == "$saved" ]] && return 0
+
+  # Conflict detected
+  printf "  \033[33m!\033[0m Saved profile is \033[1;33m%s\033[0m — you specified \033[1;33m%s\033[0m\n" "$saved" "$profile"
+  if [[ "$saves_profile" == true ]]; then
+    printf "  \033[34m•\033[0m This will update your saved profile from \033[1;33m%s\033[0m to \033[1;33m%s\033[0m\n" "$saved" "$profile"
+    echo ""
+    confirm "Switch to $profile and run setup?" || { warn "Aborted"; exit 0; }
+  else
+    printf "  \033[34m•\033[0m Running as \033[1;33m%s\033[0m for this script only — saved profile stays \033[1;33m%s\033[0m\n" "$profile" "$saved"
+    echo ""
+    confirm "Continue with $profile?" || { warn "Aborted"; exit 0; }
+  fi
+}
+
 resolve_profile() {
   local profile=""
   for arg in "$@"; do

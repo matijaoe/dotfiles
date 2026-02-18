@@ -12,6 +12,7 @@ section "Symlinks"
 
 # Resolve profile
 PROFILE="$(require_profile "$@")"
+check_profile_conflict "$PROFILE"
 show_profile "$PROFILE" "$@"
 
 TOTAL=0

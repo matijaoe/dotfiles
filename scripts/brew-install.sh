@@ -13,6 +13,7 @@ section "Brew packages"
 
 # Resolve profile
 PROFILE="$(require_profile "$@")"
+check_profile_conflict "$PROFILE"
 show_profile "$PROFILE" "$@"
 
 # Install packages
