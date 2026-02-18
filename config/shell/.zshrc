@@ -101,3 +101,7 @@ path_prepend "$HOME/.opencode/bin"
 # pnpm
 export PNPM_HOME="$HOME/Library/pnpm"
 path_prepend "$PNPM_HOME"
+
+# omnara
+export OMNARA_INSTALL="$HOME/.omnara"
+export PATH="$OMNARA_INSTALL/bin:$PATH"

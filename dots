@@ -83,16 +83,24 @@ Resolved in order:
 3. Prompt — asked during setup
 
 ## Examples
-
-    dots setup --work       # bootstrap new work Mac
-    dots save               # snapshot current state
-    dots run brew           # install Homebrew packages
-    dots run symlinks       # create config symlinks
-    dots run dock --work    # apply work Dock layout
-    dots run macos          # apply macOS defaults
-    dots run claude         # setup Claude Code configs
-    dots run curl           # install curl-based tools
 HELP
+
+  # Render examples with dim gray comments
+  local examples=(
+    "dots setup --work      |# bootstrap new work Mac"
+    "dots save              |# snapshot current state"
+    "dots run brew          |# install Homebrew packages"
+    "dots run symlinks      |# create config symlinks"
+    "dots run dock --work   |# apply work Dock layout"
+    "dots run macos         |# apply macOS defaults"
+    "dots run claude        |# setup Claude Code configs"
+    "dots run curl          |# install curl-based tools"
+  )
+  for line in "${examples[@]}"; do
+    local cmd="${line%%|*}"
+    local comment="${line#*|}"
+    printf "  %s \033[2m%s\033[0m\n" "$cmd" "$comment"
+  done
   echo ""
 }
 
