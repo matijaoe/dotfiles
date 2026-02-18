@@ -13,11 +13,12 @@ section "Brew packages"
 
 # Resolve profile
 PROFILE="$(require_profile "$@")"
+show_profile "$PROFILE" "$@"
 
 # Install packages
 BREWFILE="$DOTFILES/packages/brew/$PROFILE/Brewfile"
 if [[ ! -f "$BREWFILE" ]]; then
-  warn "No Brewfile found at $BREWFILE"
+  error "No Brewfile found at $BREWFILE"
   exit 1
 fi
 
@@ -25,41 +26,60 @@ fi
 _SPIN=("⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏")
 _SPIN_IDX=0
 clear_line() { printf "\r\033[K"; }
-dim_line()   { printf "\r\033[K  \033[2m%s\033[0m" "$1"; }
+spin_line()  { printf "\r\033[K  \033[2m%s %s\033[0m" "${_SPIN[$_SPIN_IDX]}" "$1"; _SPIN_IDX=$(( (_SPIN_IDX + 1) % ${#_SPIN[@]} )); }
 
 USING=0
 INSTALLING=0
 UPGRADING=0
+PENDING_ACTION=""  # tracks current install/upgrade in progress
 
 # Count Brewfile entries by type
 BREW_COUNT=$(grep -c '^brew ' "$BREWFILE" 2>/dev/null || echo 0)
 CASK_COUNT=$(grep -c '^cask ' "$BREWFILE" 2>/dev/null || echo 0)
 VSCODE_COUNT=$(grep -c '^vscode ' "$BREWFILE" 2>/dev/null || echo 0)
 
+# Finish a pending install/upgrade action with a permanent ✓ line
+flush_pending() {
+  if [[ -n "$PENDING_ACTION" ]]; then
+    clear_line
+    success "$PENDING_ACTION"
+    PENDING_ACTION=""
+  fi
+}
+
 # Stream brew bundle output for real-time feedback
 while IFS= read -r line; do
   if [[ "$line" =~ ^Using[[:space:]](.+) ]]; then
     ((USING++)) || true
-    dim_line "${_SPIN[$_SPIN_IDX]} ${BASH_REMATCH[1]}"
-    _SPIN_IDX=$(( (_SPIN_IDX + 1) % ${#_SPIN[@]} ))
+    flush_pending
+    spin_line "${BASH_REMATCH[1]}"
   elif [[ "$line" =~ ^Installing[[:space:]](.+) ]]; then
     ((INSTALLING++)) || true
-    clear_line
-    info "Installing ${BASH_REMATCH[1]}..."
+    flush_pending
+    PENDING_ACTION="${BASH_REMATCH[1]}"
+    spin_line "Installing ${BASH_REMATCH[1]}..."
   elif [[ "$line" =~ ^Upgrading[[:space:]](.+) ]]; then
     ((UPGRADING++)) || true
-    clear_line
-    info "Upgrading ${BASH_REMATCH[1]}..."
+    flush_pending
+    PENDING_ACTION="${BASH_REMATCH[1]}"
+    spin_line "Upgrading ${BASH_REMATCH[1]}..."
   fi
 done < <(brew bundle --file="$BREWFILE" 2>&1 || true)
 
+flush_pending
 clear_line
 
-PARTS=()
-[[ "$INSTALLING" -gt 0 ]] && PARTS+=("$INSTALLING installed")
-[[ "$UPGRADING" -gt 0 ]] && PARTS+=("$UPGRADING upgraded")
-PARTS+=("$BREW_COUNT formulae, $CASK_COUNT casks, $VSCODE_COUNT extensions up to date")
-success "$(IFS='; '; echo "${PARTS[*]}")"
+# Summary
+if [[ "$INSTALLING" -gt 0 || "$UPGRADING" -gt 0 ]]; then
+  echo ""
+  PARTS=()
+  [[ "$INSTALLING" -gt 0 ]] && PARTS+=("$INSTALLING installed")
+  [[ "$UPGRADING" -gt 0 ]] && PARTS+=("$UPGRADING upgraded")
+  JOIN=$(IFS=,; echo "${PARTS[*]}" | sed 's/,/, /g')
+  summary "$JOIN — $BREW_COUNT formulae, $CASK_COUNT casks, $VSCODE_COUNT extensions"
+else
+  summary "$BREW_COUNT formulae, $CASK_COUNT casks, $VSCODE_COUNT extensions up to date"
+fi
 
 # Configure autoupdate
 HOURS=$((BREW_AUTOUPDATE_INTERVAL / 3600))

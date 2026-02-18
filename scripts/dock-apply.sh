@@ -11,16 +11,18 @@ section "Dock"
 
 # Resolve profile
 PROFILE="$(require_profile "$@")"
+show_profile "$PROFILE" "$@"
 
 DOCK_FILE="$DOTFILES/packages/dock/${PROFILE}.txt"
 
 if [[ ! -f "$DOCK_FILE" ]]; then
-  echo "No dock config found at $DOCK_FILE"
+  error "No dock config found at $DOCK_FILE"
   exit 1
 fi
 
 if ! command -v dockutil &>/dev/null; then
-  echo "dockutil not found — install with: brew install dockutil"
+  error "dockutil not found"
+  info "Install with: brew install dockutil"
   exit 1
 fi
 
@@ -54,6 +56,7 @@ if [[ "$CURRENT" == "$DESIRED" ]]; then
   for name in "${APP_NAMES[@]}"; do
     success "$name"
   done
+  echo ""
   summary "$TOTAL apps configured"
   exit 0
 fi
@@ -87,6 +90,7 @@ done
 # Single Dock restart at the end
 killall Dock 2>/dev/null || true
 
+echo ""
 if [[ "$SKIPPED" -gt 0 ]]; then
   summary "$ADDED apps applied, $SKIPPED not found"
 else

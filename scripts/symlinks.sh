@@ -12,6 +12,7 @@ section "Symlinks"
 
 # Resolve profile
 PROFILE="$(require_profile "$@")"
+show_profile "$PROFILE" "$@"
 
 TOTAL=0
 CREATED=0
@@ -96,6 +97,7 @@ end_group "Claude Code"
 link_file "$DOTFILES/dots" "$HOME/.local/bin/dots"
 end_group "dots CLI"
 
+echo ""
 LINKED=$((TOTAL - CREATED))
 if [[ "$CREATED" -eq 0 ]]; then
   summary "$TOTAL/$TOTAL configs up to date"

@@ -6,6 +6,7 @@ set -euo pipefail
 [[ ! -t 0 ]] && exec </dev/tty
 
 source "$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/scripts/lib/common.sh"
+export DOTFILES_SETUP=1
 
 NPM_INSTALLED_FILE=""
 PNPM_INSTALLED_FILE=""
@@ -51,8 +52,8 @@ if ! has_gum; then
   unset _arch _tarball _url _gum_bin
 
   if ! has_gum; then
-    echo "Failed to bootstrap gum — cannot continue without it."
-    echo "Install manually: brew install gum"
+    printf "  \033[31m✗\033[0m Failed to bootstrap gum — cannot continue.\n"
+    printf "  \033[34m•\033[0m Install manually: brew install gum\n"
     exit 1
   fi
 fi
@@ -199,10 +200,13 @@ for name in sorted(data.get("dependencies", {}).keys()):
   done < "$DOTFILES/packages/npm-globals.txt"
   if [[ "$NPM_TOTAL" -eq 0 ]]; then
     summary "No packages configured"
-  elif [[ "$NPM_INSTALLED" -eq 0 ]]; then
-    summary "$NPM_TOTAL packages up to date"
   else
-    summary "$NPM_INSTALLED installed, $((NPM_TOTAL - NPM_INSTALLED)) already up to date"
+    echo ""
+    if [[ "$NPM_INSTALLED" -eq 0 ]]; then
+      summary "$NPM_TOTAL packages up to date"
+    else
+      summary "$NPM_INSTALLED installed, $((NPM_TOTAL - NPM_INSTALLED)) already up to date"
+    fi
   fi
 elif ! command_exists npm; then
   warn "npm not found — install Node first"
@@ -261,10 +265,13 @@ for name in sorted(deps.keys()):
   done < "$DOTFILES/packages/pnpm-globals.txt"
   if [[ "$PNPM_TOTAL" -eq 0 ]]; then
     summary "No packages configured"
-  elif [[ "$PNPM_INSTALLED" -eq 0 ]]; then
-    summary "$PNPM_TOTAL packages up to date"
   else
-    summary "$PNPM_INSTALLED installed, $((PNPM_TOTAL - PNPM_INSTALLED)) already up to date"
+    echo ""
+    if [[ "$PNPM_INSTALLED" -eq 0 ]]; then
+      summary "$PNPM_TOTAL packages up to date"
+    else
+      summary "$PNPM_INSTALLED installed, $((PNPM_TOTAL - PNPM_INSTALLED)) already up to date"
+    fi
   fi
 elif ! command_exists pnpm; then
   warn "pnpm not found — skipping"

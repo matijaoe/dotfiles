@@ -12,7 +12,9 @@ cleanup() {
 }
 trap cleanup EXIT
 
-section "Save"
+echo ""
+gum style --bold "dots save"
+echo ""
 
 # ============================================================
 # 1. Read profile
@@ -24,18 +26,19 @@ if [[ -z "$PROFILE" ]]; then
 fi
 
 printf "  \033[32m✓\033[0m Profile: \033[1;33m%s\033[0m\n" "$PROFILE"
+echo ""
 
 # ============================================================
 # 2. Snapshot current state
 # ============================================================
-SAVED=()
+info "Snapshotting..."
 
 # Brew
 mkdir -p "$DOTFILES/packages/brew/$PROFILE"
 if command_exists brew; then
-  gum spin --spinner dot --title "Dumping brew packages..." -- \
+  gum spin --spinner dot --title "Brew packages..." -- \
     brew bundle dump --describe --force --file="$DOTFILES/packages/brew/$PROFILE/Brewfile"
-  SAVED+=("Brewfile")
+  success "Brewfile"
 else
   warn "brew not found — skipping"
 fi
@@ -51,7 +54,7 @@ for url in urls:
     path = urllib.parse.unquote(url.replace('file://', '').rstrip('/'))
     print(path)
 " > "$DOTFILES/packages/dock/${PROFILE}.txt"
-SAVED+=("Dock")
+success "Dock"
 
 # npm globals
 _npm_tmp=$(mktemp)
@@ -67,7 +70,7 @@ for name, info in sorted(deps.items()):
 " > "$_npm_tmp" 2>/dev/null; then
   mv "$_npm_tmp" "$DOTFILES/packages/npm-globals.txt"
   _npm_tmp=""
-  SAVED+=("npm globals")
+  success "npm globals"
 else
   rm -f "$_npm_tmp"
   _npm_tmp=""
@@ -90,7 +93,7 @@ for store in data:
 " > "$_pnpm_tmp" 2>/dev/null; then
     mv "$_pnpm_tmp" "$DOTFILES/packages/pnpm-globals.txt"
     _pnpm_tmp=""
-    SAVED+=("pnpm globals")
+    success "pnpm globals"
   else
     rm -f "$_pnpm_tmp"
     _pnpm_tmp=""
@@ -98,16 +101,13 @@ for store in data:
   fi
 fi
 
-# Join saved items
-JOIN=$(IFS=,; echo "${SAVED[*]}" | sed 's/,/, /g')
-success "Snapshot: $JOIN"
-
 # ============================================================
 # 3. Git commit + push
 # ============================================================
 cd "$DOTFILES"
 
 if [[ -z $(git status --porcelain) ]]; then
+  echo ""
   summary "Nothing to save — repo is clean"
   exit 0
 fi
@@ -126,5 +126,5 @@ if confirm "Commit and push?"; then
   fi
   summary "Saved and pushed"
 else
-  info "Skipped — changes not committed"
+  warn "Skipped — changes not committed"
 fi

@@ -28,6 +28,7 @@ install_tool() {
 
 source "$DOTFILES/packages/curl-tools.sh"
 
+echo ""
 if [[ "$CURL_INSTALLED" -eq 0 ]]; then
   summary "$CURL_TOTAL tools up to date"
 else

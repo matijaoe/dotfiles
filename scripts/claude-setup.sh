@@ -64,6 +64,7 @@ done
 # Skills
 link_file "$CLAUDE_SRC/skills" "$CLAUDE_DEST/skills"
 
+echo ""
 TOTAL=$((LINKED + CREATED + REPLACED))
 if [[ "$CREATED" -eq 0 && "$REPLACED" -eq 0 ]]; then
   summary "$TOTAL/$TOTAL up to date"
