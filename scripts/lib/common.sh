@@ -23,6 +23,7 @@ info()    { printf "  \033[34m•\033[0m %s\n" "$1"; }
 success() { printf "  \033[32m✓\033[0m %s\n" "$1"; }
 warn()    { printf "  \033[33m!\033[0m %s\n" "$1"; }
 error()   { printf "  \033[31m✗\033[0m %s\n" "$1"; }
+summary() { printf "\033[32m✓\033[0m %s\n" "$1"; }
 
 section() {
   echo ""

@@ -19,9 +19,11 @@ if [[ ! -f "$BREWFILE" ]]; then
   exit 1
 fi
 
-# Spinner characters — each "Using" line advances the spinner
+# Transient output helpers (overwrite current line)
 _SPIN=("⠋" "⠙" "⠹" "⠸" "⠼" "⠴" "⠦" "⠧" "⠇" "⠏")
 _SPIN_IDX=0
+clear_line() { printf "\r\033[K"; }
+dim_line()   { printf "\r\033[K  \033[2m%s\033[0m" "$1"; }
 
 USING=0
 INSTALLING=0
@@ -31,23 +33,20 @@ UPGRADING=0
 while IFS= read -r line; do
   if [[ "$line" =~ ^Using[[:space:]](.+) ]]; then
     ((USING++)) || true
-    # Transient line: show spinner + package name, overwrites itself
-    printf "\r\033[K  \033[2m%s %s\033[0m" "${_SPIN[$_SPIN_IDX]}" "${BASH_REMATCH[1]}"
+    dim_line "${_SPIN[$_SPIN_IDX]} ${BASH_REMATCH[1]}"
     _SPIN_IDX=$(( (_SPIN_IDX + 1) % ${#_SPIN[@]} ))
   elif [[ "$line" =~ ^Installing[[:space:]](.+) ]]; then
     ((INSTALLING++)) || true
-    # Clear transient spinner line before printing permanent output
-    printf "\r\033[K"
+    clear_line
     info "Installing ${BASH_REMATCH[1]}..."
   elif [[ "$line" =~ ^Upgrading[[:space:]](.+) ]]; then
     ((UPGRADING++)) || true
-    printf "\r\033[K"
+    clear_line
     info "Upgrading ${BASH_REMATCH[1]}..."
   fi
 done < <(brew bundle --file="$BREWFILE" 2>&1 || true)
 
-# Clear any remaining spinner line
-printf "\r\033[K"
+clear_line
 
 if [[ "$INSTALLING" -eq 0 && "$UPGRADING" -eq 0 ]]; then
   success "$USING packages up to date"

@@ -76,7 +76,7 @@ killall Dock 2>/dev/null || true
 
 echo ""
 if [[ "$SKIPPED" -gt 0 ]]; then
-  printf "\033[32m✓\033[0m %d apps added, %d skipped\n" "$ADDED" "$SKIPPED"
+  summary "$ADDED apps added, $SKIPPED skipped"
 else
-  printf "\033[32m✓\033[0m %d apps added\n" "$ADDED"
+  summary "$ADDED apps added"
 fi

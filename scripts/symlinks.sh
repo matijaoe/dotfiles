@@ -85,7 +85,7 @@ success "dots CLI"
 echo ""
 LINKED=$((TOTAL - CREATED))
 if [[ "$CREATED" -eq 0 ]]; then
-  printf "\033[32m✓\033[0m %d/%d configs up to date\n" "$TOTAL" "$TOTAL"
+  summary "$TOTAL/$TOTAL configs up to date"
 else
-  printf "\033[32m✓\033[0m %d created, %d already linked\n" "$CREATED" "$LINKED"
+  summary "$CREATED created, $LINKED already linked"
 fi

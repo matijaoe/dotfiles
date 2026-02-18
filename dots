@@ -21,24 +21,16 @@ info()    { printf "\033[34m→\033[0m %s\n" "$1"; }
 error()   { printf "\033[31m✗\033[0m %s\n" "$1"; }
 
 show_help() {
-  local RESET=$'\033[0m'
-  local BOLD=$'\033[1m'
-  local DIM=$'\033[2m'
-  local CYAN=$'\033[36m'
-  local YELLOW=$'\033[33m'
-  local COL_W=40
+  if command -v gum &>/dev/null; then
+    _show_help_gum
+  else
+    _show_help_plain
+  fi
+}
 
-  row() {
-    local plain="$1"
-    local styled="$2"
-    local desc="$3"
-    local pad=$((COL_W - ${#plain}))
-    (( pad < 1 )) && pad=1
-    printf "  %s%*s%s%s%s\n" "$styled" "$pad" "" "$DIM" "$desc" "$RESET"
-  }
-
-  printf "\n%b" "$CYAN"
-  cat <<'EOF'
+_show_help_gum() {
+  local banner
+  banner=$(cat <<'BANNER'
 _________/\\\___________________________________________
  ________\/\\\___________________________________________
   ________\/\\\____________________/\\\___________________
@@ -48,48 +40,97 @@ _________/\\\___________________________________________
       _\/\\\__\/\\\__\//\\\__/\\\_____\/\\\_/\\__\////////\\\_
        _\//\\\\\\\/\\__\///\\\\\/______\//\\\\\____/\\\\\\\\\\_
         __\///////\//_____\/////_________\/////____\//////////__
+BANNER
+  )
+  echo ""
+  gum style --foreground 6 "$banner"
+  echo ""
+
+  gum format <<'HELP'
+**dots** — *dotfiles management CLI*
+
+## Usage
+
+`dots <command> [options]`
+
+## Commands
+
+| Command | Description |
+|---|---|
+| **setup**, **init** [--work\|--personal] | Bootstrap or re-run full setup |
+| **save**, **update** | Save current machine state to repo |
+| **run** \<script\> [profile] | Run a single script |
+| **help** | Show this help |
+
+## Scripts
+
+| Script | Description |
+|---|---|
+| **brew** | Install Homebrew packages |
+| **symlinks** | Create config symlinks |
+| **dock** | Apply Dock layout |
+| **macos** | Apply macOS defaults |
+| **claude** | Setup Claude Code configs |
+| **curl** | Install curl-based tools |
+
+## Profiles
+
+**personal**, **work**
+
+Resolved in order:
+1. Flag — `--work` or `--personal`
+2. Saved — `~/.dotfiles-profile`
+3. Prompt — asked during setup
+
+## Examples
+
+    dots setup --work       # bootstrap new work Mac
+    dots save               # snapshot current state
+    dots run brew           # install Homebrew packages
+    dots run symlinks       # create config symlinks
+    dots run dock --work    # apply work Dock layout
+    dots run macos          # apply macOS defaults
+    dots run claude         # setup Claude Code configs
+    dots run curl           # install curl-based tools
+HELP
+  echo ""
+}
+
+_show_help_plain() {
+  cat <<'EOF'
+
+dots — dotfiles management CLI
+
+Usage: dots <command> [options]
+
+Commands:
+  setup, init [--work|--personal]  Bootstrap or re-run full setup
+  save, update                     Save current machine state to repo
+  run <script> [profile]           Run a single script
+  help                             Show this help
+
+Scripts:
+  brew       Install Homebrew packages
+  symlinks   Create config symlinks
+  dock       Apply Dock layout
+  macos      Apply macOS defaults
+  claude     Setup Claude Code configs
+  curl       Install curl-based tools
+
+Profiles: personal, work
+  Resolved: 1. Flag  2. ~/.dotfiles-profile  3. Prompt
+
+Examples:
+  dots setup --work       # bootstrap new work Mac
+  dots save               # snapshot current state
+  dots run brew           # install Homebrew packages
+  dots run symlinks       # create config symlinks
+  dots run dock --work    # apply work Dock layout
+  dots run macos          # apply macOS defaults
+  dots run claude         # setup Claude Code configs
+  dots run curl           # install curl-based tools
+
 EOF
-  printf "%b\n" "$RESET"
-
-  printf "%b%s%b %s%s%b\n\n" "$BOLD" "dots" "$RESET" "$DIM" "dotfiles management CLI" "$RESET"
-
-  printf "%b%s%b\n" "$BOLD" "USAGE" "$RESET"
-  printf "  %bdots%b <command> [options]\n\n" "$CYAN" "$RESET"
-
-  printf "%b%s%b\n" "$BOLD" "COMMANDS" "$RESET"
-  row "setup, init [--work|--personal]"  "${CYAN}setup${RESET}, ${CYAN}init${RESET} [${YELLOW}--work${RESET}|${YELLOW}--personal${RESET}]"  "Bootstrap or re-run full setup"
-  row "save, update"                     "${CYAN}save${RESET}, ${CYAN}update${RESET}"                     "Save current machine state to repo"
-  row "run <script> [profile]"            "${CYAN}run${RESET} <script> [profile]"                               "Run a single script"
-  row "help"                             "${CYAN}help${RESET}"                                           "Show this help"
-  printf "\n"
-
-  printf "%b%s%b\n" "$BOLD" "SCRIPTS" "$RESET"
-  row "brew"      "${CYAN}brew${RESET}"      "Install Homebrew packages"
-  row "symlinks"  "${CYAN}symlinks${RESET}"  "Create config symlinks"
-  row "dock"      "${CYAN}dock${RESET}"      "Apply Dock layout"
-  row "macos"     "${CYAN}macos${RESET}"     "Apply macOS defaults"
-  row "claude"    "${CYAN}claude${RESET}"    "Setup Claude Code configs"
-  row "curl"      "${CYAN}curl${RESET}"      "Install curl-based tools"
-  printf "\n"
-
-  printf "%b%s%b\n" "$BOLD" "PROFILES" "$RESET"
-  printf "  %bpersonal%b, %bwork%b\n\n" "$YELLOW" "$RESET" "$YELLOW" "$RESET"
-  printf "  Resolved in order:\n"
-  row "1. Flag"    "1. Flag"    "--work or --personal"
-  row "2. Saved"   "2. Saved"   "~/.dotfiles-profile"
-  row "3. Prompt"  "3. Prompt"  "asked during setup"
-  printf "\n"
-
-  printf "%b%s%b\n" "$BOLD" "EXAMPLES" "$RESET"
-  row "dots setup --work"    "${CYAN}dots setup --work${RESET}"    "# bootstrap new work Mac"
-  row "dots save"            "${CYAN}dots save${RESET}"            "# snapshot current state"
-  row "dots run brew"        "${CYAN}dots run brew${RESET}"        "# install Homebrew packages"
-  row "dots run symlinks"    "${CYAN}dots run symlinks${RESET}"    "# create config symlinks"
-  row "dots run dock --work" "${CYAN}dots run dock --work${RESET}" "# apply work Dock layout"
-  row "dots run macos"       "${CYAN}dots run macos${RESET}"       "# apply macOS defaults"
-  row "dots run claude"      "${CYAN}dots run claude${RESET}"      "# setup Claude Code configs"
-  row "dots run curl"        "${CYAN}dots run curl${RESET}"        "# install curl-based tools"
-  printf "\n"
 }
 
 # ============================================================

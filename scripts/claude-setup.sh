@@ -66,7 +66,7 @@ link_file "$CLAUDE_SRC/skills" "$CLAUDE_DEST/skills"
 echo ""
 TOTAL=$((LINKED + CREATED + REPLACED))
 if [[ "$CREATED" -eq 0 && "$REPLACED" -eq 0 ]]; then
-  printf "\033[32m✓\033[0m %d/%d up to date\n" "$TOTAL" "$TOTAL"
+  summary "$TOTAL/$TOTAL up to date"
 else
-  printf "\033[32m✓\033[0m %d created, %d replaced, %d already linked\n" "$CREATED" "$REPLACED" "$LINKED"
+  summary "$CREATED created, $REPLACED replaced, $LINKED already linked"
 fi
