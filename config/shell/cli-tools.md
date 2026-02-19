@@ -17,7 +17,6 @@
 | `lg`                  | lazygit         | Terminal git UI                          |
 | `ld`                  | lazydocker      | Terminal docker UI                       |
 | `lwt`                 | lazyworktree    | Git worktree TUI                         |
-| `gh dash`             | gh-dash         | GitHub PR/issues dashboard               |
 | `btm`                 | bottom          | System monitor                           |
 | `gh`                  | gh              | GitHub CLI — PRs, issues, repos          |
 | `fzf`                 | fzf             | Fuzzy finder — powers Ctrl+R, Ctrl+T, Tab |

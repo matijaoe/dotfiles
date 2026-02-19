@@ -23,11 +23,6 @@ if ! command_exists mas; then
   exit 0
 fi
 
-if ! mas account &>/dev/null; then
-  warn "Not signed in to App Store — sign in and run: dots run mas"
-  exit 0
-fi
-
 MAS_FILE="$DOTFILES/packages/mas/personal.txt"
 if [[ ! -f "$MAS_FILE" ]]; then
   warn "No app list at packages/mas/personal.txt"
