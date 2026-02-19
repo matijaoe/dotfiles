@@ -201,7 +201,7 @@
     ],
     "defaultMode": "acceptEdits"
   },
-  "model": "sonnet[1m]",
+  "model": "sonnet",
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "context7"
@@ -222,25 +222,6 @@
           {
             "type": "command",
             "command": "afplay /System/Library/Sounds/Glass.aiff &"
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/format-on-edit.local.sh"
-          },
-          {
-            "type": "command",
-            "command": ".claude/hooks/auto-install.local.sh"
-          },
-          {
-            "type": "command",
-            "command": ".claude/hooks/auto-test.local.sh"
           }
         ]
       }
