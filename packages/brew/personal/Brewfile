@@ -84,6 +84,8 @@ brew "lazydocker"
 brew "lazygit"
 # List USB devices, just like the Linux lsusb command
 brew "lsusb"
+# Mac App Store command-line interface
+brew "mas"
 # Modern and intuitive terminal-based text editor
 brew "micro"
 # Simple tool to make locally trusted development certificates
@@ -383,6 +385,33 @@ cask "wispr-flow"
 cask "xquartz"
 # Application for generating TOTP and HOTP codes
 cask "yubico-authenticator"
+mas "1Password for Safari", id: 1569813296
+mas "Actions", id: 1586435171
+mas "Amphetamine", id: 937984704
+mas "Anybox", id: 1593408455
+mas "Codepoint", id: 6444068649
+mas "Coin Tick", id: 1141688067
+mas "Dropover", id: 1355679052
+mas "Endel", id: 1346247457
+mas "Flighty", id: 1358823008
+mas "Image2WebP", id: 6670599252
+mas "Lightweight PDF", id: 1450640351
+mas "Magic Disk Benchmark", id: 1608793370
+mas "Numbers", id: 361304891
+mas "Pages", id: 409201541
+mas "Pandan", id: 1569600264
+mas "Perplexity", id: 6714467650
+mas "Plain Text Editor", id: 1572202501
+mas "Reeder", id: 6475002485
+mas "Shareful", id: 1522267256
+mas "Speediness", id: 1596706466
+mas "Speedtest", id: 1153157709
+mas "Streaks", id: 963034692
+mas "Strongbox", id: 897283731
+mas "TestFlight", id: 899247664
+mas "Whisper Transcription", id: 1668083311
+mas "Wipr", id: 1320666476
+mas "Xcode", id: 497799835
 vscode "afzalsayed96.icones"
 vscode "albert.tabout"
 vscode "amirha.better-comments-2"

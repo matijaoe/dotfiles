@@ -344,9 +344,6 @@ if [[ "$PROFILE" == "work" ]] && ! docker info &>/dev/null; then
   MANUAL_STEPS+=("Docker — open OrbStack to complete setup")
 fi
 
-if [[ "$PROFILE" == "personal" ]]; then
-  MANUAL_STEPS+=("App Store — sign in to install MAS apps: dots run mas")
-fi
 
 if [[ ${#MANUAL_STEPS[@]} -gt 0 ]]; then
   echo ""
