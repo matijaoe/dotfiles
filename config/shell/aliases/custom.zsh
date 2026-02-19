@@ -61,4 +61,11 @@ alias dockerlist='docker ps --format "table {{.ID}}\t{{.Names}}\t{{.Status}}"'
 alias see="glow"
 alias "?"="tldr"
 
+# Run cursor agent headless
+a() {
+  local model=anthropic/claude-haiku-4-5
+  opencode run -m $model "$@"
+}
+
 alias ..="cd .." 
+

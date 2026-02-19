@@ -111,3 +111,6 @@ path_prepend "$PNPM_HOME"
 
 # deno
 [ -s "$HOME/.deno/env" ] && source "$HOME/.deno/env"
+
+# claude-proxy — intercept & log Claude Code API traffic
+[ -f "$HOME/.claude-proxy/env.sh" ] && source "$HOME/.claude-proxy/env.sh"

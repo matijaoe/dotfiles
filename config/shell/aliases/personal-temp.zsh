@@ -4,7 +4,7 @@
 # ============================================================
 
 # Clipboard
-alias c="pbcopy"
+alias copy="pbcopy"
 
 # Navigation
 alias seed="cd ~/Documents/SEED"
