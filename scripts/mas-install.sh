@@ -43,13 +43,16 @@ while IFS= read -r line; do
   fi
   ((TOTAL++)) || true
   if echo "$MAS_INSTALLED" | grep -q "^$app_id "; then
-    success "$app_name"
+    info "$app_name"
   else
-    if gum spin --spinner dot --title "Installing $app_name..." -- mas install "$app_id"; then
+    install_out=$(mas install "$app_id" 2>&1) && install_ok=true || install_ok=false
+    if [[ "$install_ok" == false ]]; then
+      warn "$app_name (failed)"
+    elif echo "$install_out" | grep -q "Already installed"; then
+      info "$app_name"
+    else
       success "$app_name"
       ((INSTALLED++)) || true
-    else
-      warn "$app_name (failed)"
     fi
   fi
 done < "$MAS_FILE"
