@@ -175,8 +175,6 @@ cask "font-victor-mono"
 cask "gather"
 # Terminal emulator that uses platform-native UI and GPU acceleration
 cask "ghostty@tip"
-# Desktop client for GitHub repositories
-cask "github"
 # Web browser
 cask "google-chrome"
 # Client for the Google Drive storage service
