@@ -12,6 +12,11 @@ cleanup() {
 }
 trap cleanup EXIT
 
+AUTO_YES=false
+for arg in "$@"; do
+  [[ "$arg" == "-y" ]] && AUTO_YES=true
+done
+
 echo ""
 gum style --bold "dots save"
 echo ""
@@ -117,7 +122,7 @@ info "Changes detected:"
 git status --short
 echo ""
 
-if confirm "Commit and push?"; then
+if $AUTO_YES || confirm "Commit and push?"; then
   git add -A
   git commit -m "save: $(date '+%Y-%m-%d %H:%M')"
   if ! git push; then

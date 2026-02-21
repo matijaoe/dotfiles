@@ -22,7 +22,7 @@ After setup, the `dots` CLI is available. Run `dots help` for full usage.
 
 ```sh
 dots setup [--work|--personal] [-y]  # full system setup
-dots save                        # save current state to repo
+dots save [-y]                   # save current state to repo
 dots run <script> [profile]      # run individual script
 dots run brew                    # install Homebrew packages
 dots run symlinks                # create config symlinks
@@ -71,7 +71,7 @@ Profile is resolved in order:
 
 ## Save flow
 
-`dots save` snapshots the current machine state and prompts to commit and push.
+`dots save` snapshots the current machine state and prompts to commit and push. Pass `-y` to skip the confirmation and commit+push automatically.
 
 | #   | Step                  | Output                             |
 | --- | --------------------- | ---------------------------------- |

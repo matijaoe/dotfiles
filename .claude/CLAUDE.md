@@ -20,7 +20,7 @@
 
 ## When making changes
 
-- Update `README.md` when adding/moving/removing files, scripts, or setup steps
+- Update `README.md` when adding/moving/removing files, scripts, setup steps, or CLI flags/arguments — this includes any new options added to `save.sh`, `setup.sh`, or other entry points
 - Update `setup.sh` step numbers if the order changes
 - When extracting a step from `setup.sh` into a standalone script, keep `setup.sh` calling it
 - When adding a new config, add the symlink to both `scripts/symlinks.sh` and verify it in `setup.sh`
