@@ -65,6 +65,8 @@ brew "lsusb"
 brew "micro"
 # Polyglot runtime manager (asdf rust clone)
 brew "mise"
+# Simple tool to make locally trusted development certificates
+brew "mkcert"
 # Deep clean and optimize your Mac
 brew "mole"
 # Node version management
@@ -219,12 +221,8 @@ cask "pearcleaner"
 cask "proton-mail"
 # Control your tools with a few keystrokes
 cask "raycast"
-# JavaScript playground that auto-evaluates as code is typed
-cask "runjs"
 # Tool to reverse the direction of scrolling
 cask "scroll-reverser"
-# Block your own access to distracting websites
-cask "selfcontrol"
 # Team communication and collaboration software
 cask "slack"
 # Music streaming service

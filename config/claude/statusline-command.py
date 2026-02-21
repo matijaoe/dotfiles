@@ -24,9 +24,11 @@ CONFIG = {
 
 COLORS = {
     # Models
+    "model_opus_1m_fg": "#000000",  # Black text
+    "model_opus_1m_bg": "#A34455",  # Muted Coral Pink
     "model_sonnet_1m": "#F5A80B",  # Amber
     "model_sonnet": "#EB875F",  # Anthropic Orange
-    "model_opus": "#FF6B80",  # Coral Pink
+    "model_opus": "#FF6A82",  # Coral Pink
     "model_haiku": "#D4A8E8",  # Lavender
     "model_unknown": "#ABB1BF",  # Gray
 
@@ -52,12 +54,14 @@ COLORS = {
     "cost": "#F0DC8E",
 }
 
-# Order matters: more specific patterns must come first (e.g. sonnet+1m before sonnet)
+# Order matters: more specific patterns must come first (e.g. opus+1m before opus, sonnet+1m before sonnet)
+# Entries are (keywords, fg_color, bg_color_or_None)
 MODEL_COLOR_MAP = [
-    (["sonnet", "1m"], COLORS["model_sonnet_1m"]),
-    (["opus"], COLORS["model_opus"]),
-    (["sonnet"], COLORS["model_sonnet"]),
-    (["haiku"], COLORS["model_haiku"]),
+    (["opus", "1m"], COLORS["model_opus_1m_fg"], COLORS["model_opus_1m_bg"]),
+    (["sonnet", "1m"], COLORS["model_sonnet_1m"], None),
+    (["opus"], COLORS["model_opus"], None),
+    (["sonnet"], COLORS["model_sonnet"], None),
+    (["haiku"], COLORS["model_haiku"], None),
 ]
 
 CONTEXT_THRESHOLDS = {
@@ -145,18 +149,24 @@ def parse_model_name(model_id):
     return f"{family}{suffix}"
 
 
-def get_model_color(name):
+def get_model_colors(name):
+    """Return (fg, bg) tuple for the given model name."""
     lower = name.lower()
-    for keywords, color in MODEL_COLOR_MAP:
+    for keywords, fg, bg in MODEL_COLOR_MAP:
         if all(kw in lower for kw in keywords):
-            return color
-    return COLORS["model_unknown"]
+            return fg, bg
+    return COLORS["model_unknown"], None
 
 
 def style_model(name):
     if not name or name == "unknown":
         return dim("unknown")
-    return colored(name, fg=get_model_color(name))
+    fg, bg = get_model_colors(name)
+    text = f" {name} " if bg else name
+    result = colored(text, fg=fg, bg=bg)
+    if bg:
+        result = f"\033[1m{result}"
+    return result
 
 
 # ============================================================================
@@ -344,7 +354,10 @@ def build_status_line(data):
     if CONFIG["show_session_id"]:
         parts.append(dim(session_id[:8]))
     if repo_name:
-        parts.append(colored(repo_name, fg=COLORS["repo"]))
+        repo_text = colored(repo_name, fg=COLORS["repo"])
+        if remote_url:
+            repo_text = hyperlink(repo_text, remote_url)
+        parts.append(repo_text)
     if CONFIG["show_cost"]:
         total = data.get("cost", {}).get("total_cost_usd", 0)
         if total > 0:
