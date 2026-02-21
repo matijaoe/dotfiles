@@ -115,6 +115,5 @@ path_prepend "$PNPM_HOME"
 # claude-proxy — intercept & log Claude Code API traffic
 [ -f "$HOME/.claude-proxy/env.sh" ] && source "$HOME/.claude-proxy/env.sh"
 
-# omnara
-export OMNARA_INSTALL="$HOME/.omnara"
-export PATH="$OMNARA_INSTALL/bin:$PATH"
+# Allow unquoted URLs with ? and & (otherwise zsh treats them like globs and errors)
+setopt NO_NOMATCH

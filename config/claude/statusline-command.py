@@ -13,9 +13,8 @@ from datetime import datetime
 
 CONFIG = {
     "show_cost": False,
-    "show_session_id": False,  # Debug: show session ID prefix
     "show_model_id": False,  # Debug: show raw model ID instead of parsed name
-    "debug_log": True,  # Write to ~/.claude/statusline-debug.log
+    "debug_log": False,  # Write to ~/.claude/statusline-debug.log
 }
 
 # ============================================================================
@@ -54,7 +53,8 @@ COLORS = {
     "cost": "#F0DC8E",
 }
 
-# Order matters: more specific patterns must come first (e.g. opus+1m before opus, sonnet+1m before sonnet)
+# Order matters: more specific patterns must come first (e.g. Opus+1m before Opus).
+# Keywords match substrings of display_name (e.g. "Claude Sonnet 4.6"), case-insensitive.
 # Entries are (keywords, fg_color, bg_color_or_None)
 MODEL_COLOR_MAP = [
     (["opus", "1m"], COLORS["model_opus_1m_fg"], COLORS["model_opus_1m_bg"]),
@@ -110,43 +110,6 @@ def hyperlink(text, url):
 # ============================================================================
 # MODEL
 # ============================================================================
-
-
-def parse_model_name(model_id):
-    """
-    Parse a model ID into a display name.
-
-    claude-opus-4-6            → Opus 4.6
-    claude-sonnet-4-5-20250929 → Sonnet 4.5
-    claude-sonnet-4-5-20250929[1m] → Sonnet 4.5 [1M]
-    claude-haiku-4-5-20251001  → Haiku 4.5
-    """
-    if not model_id or model_id == "unknown":
-        return "unknown"
-
-    suffix = ""
-    base = model_id
-    if "[" in base:
-        base, suffix_raw = base.split("[", 1)
-        suffix = f" [{suffix_raw.rstrip(']').upper()}]"
-
-    parts = base.split("-")
-    start = 1 if parts[0] == "claude" else 0
-
-    if len(parts) <= start:
-        return model_id
-
-    family = parts[start].capitalize()
-
-    version_parts = []
-    for part in parts[start + 1 :]:
-        if part.isdigit() and len(part) >= 8:  # date segment, stop
-            break
-        version_parts.append(part)
-
-    if version_parts:
-        return f"{family} {'.'.join(version_parts)}{suffix}"
-    return f"{family}{suffix}"
 
 
 def get_model_colors(name):
@@ -323,11 +286,20 @@ def build_status_line(data):
 
     # -- Model --
     model_id = data.get("model", {}).get("id", "unknown")
-    model_name = parse_model_name(model_id)
+    model_name = data.get("model", {}).get("display_name") or ""
     session_id = data.get("session_id", "unknown")
     write_debug_log(session_id, model_id, model_name)
 
-    display_model = model_id if CONFIG["show_model_id"] else model_name
+    if CONFIG["show_model_id"]:
+        display_model = model_id
+    else:
+        # Strip any parenthetical context size suffix from display name, e.g. " (1M context)"
+        import re
+        display_model = re.sub(r"\s*\([^)]*context[^)]*\)", "", model_name).strip()
+        # Append [1M] badge if the context window is 1M or larger
+        ctx_size = data.get("context_window", {}).get("context_window_size", 0)
+        if ctx_size >= 1_000_000:
+            display_model += " [1M]"
 
     # -- Effort level (read from settings files, not stdin JSON) --
     cwd = data.get("workspace", {}).get("current_dir")
@@ -337,7 +309,7 @@ def build_status_line(data):
     # -- Context --
     ctx = data.get("context_window", {})
     used_pct = ctx.get("used_percentage")
-    is_extended = ctx.get("total", 0) > 500_000
+    is_extended = ctx.get("context_window_size", 0) > 500_000
 
     # -- Git --
     project_dir = data.get("workspace", {}).get("project_dir")
@@ -351,13 +323,12 @@ def build_status_line(data):
         model_part += " " + effort_bar
     parts = [model_part, style_context(used_pct, is_extended)]
 
-    if CONFIG["show_session_id"]:
-        parts.append(dim(session_id[:8]))
     if repo_name:
         repo_text = colored(repo_name, fg=COLORS["repo"])
         if remote_url:
             repo_text = hyperlink(repo_text, remote_url)
         parts.append(repo_text)
+
     if CONFIG["show_cost"]:
         total = data.get("cost", {}).get("total_cost_usd", 0)
         if total > 0:
@@ -365,12 +336,14 @@ def build_status_line(data):
 
     output = sep.join(parts)
 
-    # -- Second line: branch (clickable if pushed to remote) --
+    # -- Second line: branch (clickable if pushed to remote) · open in Cursor --
     if branch:
         branch_text = colored(branch, fg=COLORS["branch"])
         if remote_url and branch_exists_on_remote(project_dir, branch):
             branch_text = hyperlink(branch_text, f"{remote_url}/compare/{branch}")
-        output += "\n" + branch_text
+        open_dir = project_dir or cwd
+        open_text = hyperlink(colored("cursor ↗", fg=COLORS["separator"]), f"cursor://file/{open_dir}")
+        output += "\n" + branch_text + sep + open_text
 
     return output
 

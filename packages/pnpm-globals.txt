@@ -1,3 +1,2 @@
-netlify-cli
+pnpm
 surge
-trash-cli

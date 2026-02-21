@@ -43,8 +43,38 @@ alias pw="openssl rand -base64 30 | pbcopy && echo 'Password copied to clipboard
 alias localip="ipconfig getifaddr en0"
 alias ip="curl http://ipecho.net/plain; echo"
 
+function ports() {
+  lsof -nP -iTCP -sTCP:LISTEN
+}
+
+function killport() {
+  lsof -ti tcp:"$1" | xargs kill -9
+}
+
+# What is this command actually?”
+alias wh='type -a'
+
 # GitHub
 alias ghb="gh browse"
+
+# ff = "find filename" anywhere: fast global name search, includes dotfiles, but skips junk dirs (node_modules/dist/build/etc.)
+function ff() {
+  fd -i "$1" . \
+    --hidden \
+    --exclude .git \
+    --exclude node_modules \
+    --exclude dist \
+    --exclude build \
+    --exclude .next \
+    --exclude coverage \
+    --exclude .turbo
+}
+
+# rgf = repo-focused filename search: lists tracked/non-ignored files (respects .gitignore) then filters by name
+function rgf() { rg --files | rg -i "$1"; }
+
+# rgi = content search: search INSIDE files for text/code (case-insensitive; respects .gitignore)
+alias rgi='rg -i'
 
 # Navigation
 take() { mkdir -p "$@" && cd "${@:$#}"; }

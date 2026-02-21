@@ -94,6 +94,10 @@ for agent in "$DOTFILES/config/claude/agents/"*.md; do
 done
 end_group "Claude Code"
 
+# yt-dlp
+link_file "$DOTFILES/config/yt-dlp/config"        "$HOME/.config/yt-dlp/config"
+end_group "yt-dlp"
+
 # dots CLI
 link_file "$DOTFILES/dots" "$HOME/.local/bin/dots"
 end_group "dots CLI"

@@ -16,10 +16,15 @@ alias sshh="ssh homelab"
 alias rate="curl rate.sx"
 alias wttr="curl wttr.in"
 
-# yt-dlp
-alias ytdl="yt-dlp -f bestvideo+bestaudio --embed-thumbnail "
-alias ytdla="yt-dlp -x -f bestaudio --embed-thumbnail --audio-quality 0 "
-alias ytdlaf="yt-dlp -x -f bestaudio --embed-thumbnail --audio-quality 0 --audio-format "
+# Download best video and audio
+function yt() {
+  yt-dlp -f "bestvideo+bestaudio/best" --embed-thumbnail "$@"
+}
+
+# Download best audio
+function yta() {
+  yt-dlp -x -f bestaudio --embed-thumbnail "$@"
+}
 
 # ffmpeg metadata
 alias ffmeta="ffprobe -v quiet -print_format json -show_format "
