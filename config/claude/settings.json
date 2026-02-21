@@ -1,6 +1,6 @@
 {
   "env": {
-    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
   },
   "attribution": {
     "commit": "",
@@ -201,7 +201,6 @@
     ],
     "defaultMode": "acceptEdits"
   },
-  "model": "sonnet",
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [
     "context7"

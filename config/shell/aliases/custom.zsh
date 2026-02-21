@@ -47,6 +47,8 @@ alias ip="curl http://ipecho.net/plain; echo"
 alias ghb="gh browse"
 
 # Navigation
+take() { mkdir -p "$@" && cd "${@:$#}"; }
+
 alias dl="~/Downloads"
 alias dt="~/Desktop"
 alias dc="~/Documents"

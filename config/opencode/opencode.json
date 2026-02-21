@@ -7,5 +7,15 @@
         "external_directory": "allow"
       }
     }
+  },
+  "mcp": {
+    "apigcp": {
+      "type": "remote",
+      "url": "https://apigcp.trynia.ai/mcp",
+      "enabled": true,
+      "headers": {
+        "Authorization": "Bearer nk_tJAmUqwxhXZvCHOIgIG0AGlcqkeNAIFH"
+      }
+    }
   }
 }
