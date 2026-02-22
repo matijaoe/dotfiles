@@ -1,5 +1,4 @@
 /Applications/Helium.app
-/Applications/Brave Browser Beta.app
 /Applications/Proton Mail.app
 /Applications/Ghostty.app
 /Applications/Cursor.app

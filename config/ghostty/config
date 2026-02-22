@@ -19,7 +19,7 @@ adjust-cursor-thickness = 2
 # ============================================
 # Theme & Colors
 # ============================================
-theme = light:Kanso Pearl,dark:Mellow
+theme = light:Adwaita,dark:Mellow
 
 # ============================================
 # Window & Appearance

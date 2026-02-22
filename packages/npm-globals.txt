@@ -1,1 +1,1 @@
-dmux
+trash-cli
