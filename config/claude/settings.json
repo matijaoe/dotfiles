@@ -205,7 +205,6 @@
     ],
     "defaultMode": "acceptEdits"
   },
-  "model": "sonnet",
   "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": [],
   "disabledMcpjsonServers": [
