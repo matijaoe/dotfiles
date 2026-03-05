@@ -114,11 +114,48 @@
       "Bash(done)",
       "Bash(yarn --version:*)",
       "Bash(yarn workspace:*)",
-      "WebFetch(domain:formulae.brew.sh)"
+      "WebFetch(domain:formulae.brew.sh)",
+      "Read(./**)",
+      "Glob(./**)",
+      "Grep(./**)",
+      "Bash(ccusage:*)",
+      "Bash(do time zsh -i -c exit)",
+      "Bash(yarn vitest run:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(source:*)",
+      "Bash(ln:*)",
+      "Bash(curl:*)",
+      "Bash(echo:*)",
+      "Bash(find:*)",
+      "WebFetch(domain:tiptap.dev)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:sertxu.dev)",
+      "WebFetch(domain:vikramthyagarajan.medium.com)",
+      "WebFetch(domain:kajetan.io)"
     ],
     "deny": [
       "Bash(rm -rf:*)",
-      "Bash(sudo:*)"
+      "Bash(sudo:*)",
+      "Bash(*db:clean*)",
+      "Bash(*db:drop*)",
+      "Bash(*db:reset*)",
+      "Bash(*db:filled*)",
+      "Bash(*dropDatabase*)",
+      "Bash(*DROP DATABASE*)",
+      "Bash(*drop database*)",
+      "Bash(*Drop Database*)",
+      "Bash(*Drop database*)",
+      "Bash(*DROP database*)",
+      "Bash(*drop DATABASE*)",
+      "Read(./.env)",
+      "Read(./.env*)",
+      "Read(./**/.env)",
+      "Read(./**/.env*)",
+      "Grep(./.env)",
+      "Grep(./.env*)",
+      "Grep(./**/.env)",
+      "Grep(./**/.env*)"
     ],
     "ask": [
       "mcp__linear__create_attachment",
@@ -201,7 +238,14 @@
       "Bash(gh run rerun:*)",
       "Bash(gh workflow disable:*)",
       "Bash(gh workflow enable:*)",
-      "Bash(gh workflow run:*)"
+      "Bash(gh workflow run:*)",
+      "Bash(*migration:run*)",
+      "Bash(*migration:revert*)",
+      "Bash(*migration:generate*)",
+      "Bash(*typeorm*migration*)",
+      "Bash(*schema:sync*)",
+      "Bash(*schema:drop*)",
+      "Bash(git commit:*)"
     ],
     "defaultMode": "acceptEdits"
   },
@@ -248,10 +292,17 @@
     "context7@claude-plugins-official": true,
     "code-simplifier@claude-plugins-official": true,
     "code-review@claude-plugins-official": true,
-    "frontend-design@claude-plugins-official": true,
     "typescript-lsp@claude-plugins-official": true,
     "commit-commands@claude-plugins-official": true,
     "superpowers@claude-plugins-official": false
+  },
+  "extraKnownMarketplaces": {
+    "wakatime": {
+      "source": {
+        "source": "git",
+        "url": "https://github.com/wakatime/claude-code-wakatime.git"
+      }
+    }
   },
   "alwaysThinkingEnabled": true,
   "autoUpdatesChannel": "latest",
@@ -259,6 +310,5 @@
   "showTurnDuration": true,
   "terminal": {
     "lineHeight": 1.3
-  },
-  "effortLevel": "medium"
+  }
 }

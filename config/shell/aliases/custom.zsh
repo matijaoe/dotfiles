@@ -101,3 +101,5 @@ a() {
 
 alias ..="cd .." 
 
+alias c="claude"
+alias yolo="claude --dangerously-skip-permissions" 

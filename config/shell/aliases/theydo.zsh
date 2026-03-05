@@ -12,7 +12,9 @@ td_run_yarn() {
 }
 
 alias lint="yarn lint:webapp"
-alias format="yarn format:webapp"
+alias format="yarn format:ci"
+alias formatw="yarn format:webapp"
+
 
 alias fro="td_run_yarn dev:webapp"
 alias ser="td_run_yarn dev:graphql-server"
