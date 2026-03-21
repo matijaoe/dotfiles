@@ -23,13 +23,13 @@ CONFIG = {
 
 COLORS = {
     # Models
-    "model_opus_1m_fg": "#000000",  # Black text
-    "model_opus_1m_bg": "#A34455",  # Muted Coral Pink
-    "model_sonnet_1m": "#F5A80B",  # Amber
-    "model_sonnet": "#EB875F",  # Anthropic Orange
-    "model_opus": "#FF6A82",  # Coral Pink
-    "model_haiku": "#D4A8E8",  # Lavender
-    "model_unknown": "#ABB1BF",  # Gray
+    "model_opus_1m_fg": "#000000", 
+    "model_opus_1m_bg": "#F5A80B", 
+    "model_sonnet_1m": "#EB875F",  
+    "model_sonnet": "#EB875F", 
+    "model_opus": "#F5A80B", 
+    "model_haiku": "#D4A8E8", 
+    "model_unknown": "#ABB1BF", 
 
     # Context usage
     "context_low": "#60BA9C",  # Sea Green
