@@ -40,10 +40,6 @@ COLORS = {
     "context_overflow_fg": "#FFFFFF",
     "context_overflow_bg": "#C43D4B",  # Dark Red
 
-    # Effort level (matches Anthropic's official selector)
-    "effort_active": "#D77757",  # Anthropic Orange
-    "effort_inactive": "#505050",  # Dark Gray
-
     # Git
     "repo": "#DA9BB8",  # Pink
     "branch": "#89CFF0",  # Sky Blue
@@ -57,7 +53,6 @@ COLORS = {
 # Keywords match substrings of display_name (e.g. "Claude Sonnet 4.6"), case-insensitive.
 # Entries are (keywords, fg_color, bg_color_or_None)
 MODEL_COLOR_MAP = [
-    (["opus", "1m"], COLORS["model_opus_1m_fg"], COLORS["model_opus_1m_bg"]),
     (["sonnet", "1m"], COLORS["model_sonnet_1m"], None),
     (["opus"], COLORS["model_opus"], None),
     (["sonnet"], COLORS["model_sonnet"], None),
@@ -130,67 +125,6 @@ def style_model(name):
     if bg:
         result = f"\033[1m{result}"
     return result
-
-
-# ============================================================================
-# EFFORT LEVEL
-# ============================================================================
-
-EFFORT_BAR = "▌"
-EFFORT_LEVELS = {"low": 1, "medium": 2, "high": 3}
-
-
-def get_effort_level(cwd):
-    """
-    Read effort level from settings files.
-
-    Priority: env var > project settings > user settings > None.
-    Note: This reads the *configured* setting, not a session-specific value.
-    When changed via /model, the settings file updates and this picks it up.
-    See: github.com/anthropics/claude-code/issues/9488
-    """
-    env = os.environ.get("CLAUDE_CODE_EFFORT_LEVEL")
-    if env:
-        return env.lower()
-
-    paths = []
-    if cwd:
-        paths.append(os.path.join(cwd, ".claude", "settings.json"))
-    paths.append(os.path.expanduser("~/.claude/settings.json"))
-
-    for path in paths:
-        try:
-            with open(path) as f:
-                level = json.load(f).get("effortLevel")
-                if level:
-                    return level.lower()
-        except (OSError, json.JSONDecodeError, AttributeError):
-            continue
-
-    return "high"
-
-
-def supports_effort_level(model_id):
-    """Check if model supports effort levels (currently only Opus 4.6+)."""
-    if not model_id:
-        return False
-    lower = model_id.lower()
-    # Check for opus-4-6 or higher
-    return "opus" in lower and ("4-6" in lower or "4-7" in lower or "4-8" in lower or "4-9" in lower or "5-" in lower)
-
-
-def style_effort(level, model_id):
-    """Build effort bar: ▮▮▮ with orange active / dark gray inactive."""
-    if not supports_effort_level(model_id) or level is None:
-        return None
-
-    active = EFFORT_LEVELS.get(level, 3)
-    inactive = 3 - active
-
-    bar = colored(EFFORT_BAR * active, fg=COLORS["effort_active"])
-    if inactive:
-        bar += colored(EFFORT_BAR * inactive, fg=COLORS["effort_inactive"])
-    return bar
 
 
 # ============================================================================
@@ -301,15 +235,12 @@ def build_status_line(data):
         if ctx_size >= 1_000_000:
             display_model += " [1M]"
 
-    # -- Effort level (read from settings files, not stdin JSON) --
-    cwd = data.get("workspace", {}).get("current_dir")
-    effort = get_effort_level(cwd)
-    effort_bar = style_effort(effort, model_id)
-
     # -- Context --
     ctx = data.get("context_window", {})
     used_pct = ctx.get("used_percentage")
     is_extended = ctx.get("context_window_size", 0) > 500_000
+
+    cwd = data.get("workspace", {}).get("current_dir")
 
     # -- Git --
     project_dir = data.get("workspace", {}).get("project_dir")
@@ -317,10 +248,8 @@ def build_status_line(data):
     repo_name = get_repo_name(project_dir)
     remote_url = get_remote_url(project_dir)
 
-    # -- First line: model [effort] · context · [session] · [repo] · [cost] --
+    # -- First line: model · context · [repo] · [cost] --
     model_part = style_model(display_model)
-    if effort_bar:
-        model_part += " " + effort_bar
     parts = [model_part, style_context(used_pct, is_extended)]
 
     if repo_name:

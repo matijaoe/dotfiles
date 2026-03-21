@@ -146,3 +146,5 @@ keybind = cmd+s>6=goto_tab:6
 keybind = cmd+s>7=goto_tab:7
 keybind = cmd+s>8=goto_tab:8
 keybind = cmd+s>9=goto_tab:9
+
+macos-option-as-alt=true

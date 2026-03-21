@@ -11,11 +11,16 @@ tap "px4/px4"
 tap "sandreas/tap"
 tap "satococoa/tap"
 tap "sst/tap"
+tap "tw93/tap"
 tap "valkyrie00/bbrew"
 # Simple, modern, secure file encryption
 brew "age"
 # Plugin manager for zsh, inspired by antigen and antibody
 brew "antidote"
+# Open-source, cross-platform JavaScript runtime environment
+brew "node"
+# Apify command-line interface
+brew "apify-cli"
 # Package compiler and linker metadata toolkit
 brew "pkgconf"
 # Automated text file generator
@@ -132,6 +137,10 @@ brew "ripgrep-all"
 brew "rsync"
 # Low-level access to audio, keyboard, mouse, joystick, and graphics
 brew "sdl2"
+# Hunt down social media accounts by username
+brew "sherlock"
+# Export Slack data without admin privileges
+brew "slackdump"
 # Cross-shell prompt for astronauts
 brew "starship"
 # Generate scripting interfaces to C/C++ code
@@ -158,6 +167,8 @@ brew "vercel-cli"
 brew "virtualenv"
 # Internet file retriever
 brew "wget"
+# Blazing fast terminal file manager written in Rust, based on async I/O
+brew "yazi"
 # Feature-rich command-line audio/video downloader
 brew "yt-dlp"
 # Shell extension to navigate your filesystem faster
@@ -290,8 +301,6 @@ cask "jordanbaird-ice@beta"
 cask "keepassxc"
 # File archiver
 cask "keka"
-# End-to-end encryption software
-cask "keybase"
 # Blocks all Keyboard and TouchBar input
 cask "keyboardcleantool"
 # Tool to show what is persistently installed on the computer
@@ -334,8 +343,6 @@ cask "pearcleaner"
 cask "proton-drive"
 # Client for Proton Mail and Proton Calendar
 cask "proton-mail"
-# Bridges Proton Mail to email clients supporting IMAP and SMTP protocols
-cask "proton-mail-bridge"
 # VPN client focusing on security
 cask "protonvpn"
 # Peer to peer Bitorrent client
@@ -384,34 +391,25 @@ cask "whatsapp"
 cask "wispr-flow"
 # Open-source version of the X.Org X Window System
 cask "xquartz"
-# Application for generating TOTP and HOTP codes
+# Full-featured companion app to the YubiKey
 cask "yubico-authenticator"
-mas "1Password for Safari", id: 1569813296
 mas "Actions", id: 1586435171
 mas "Amphetamine", id: 937984704
-mas "Anybox", id: 1593408455
 mas "Codepoint", id: 6444068649
-mas "Coin Tick", id: 1141688067
 mas "Dropover", id: 1355679052
 mas "Endel", id: 1346247457
 mas "Flighty", id: 1358823008
-mas "Image2WebP", id: 6670599252
 mas "Lightweight PDF", id: 1450640351
 mas "Magic Disk Benchmark", id: 1608793370
 mas "Numbers", id: 361304891
 mas "Pages", id: 409201541
 mas "Pandan", id: 1569600264
-mas "Perplexity", id: 6714467650
 mas "Plain Text Editor", id: 1572202501
-mas "Reeder", id: 6475002485
 mas "Shareful", id: 1522267256
 mas "Speediness", id: 1596706466
 mas "Speedtest", id: 1153157709
-mas "Streaks", id: 963034692
 mas "Strongbox", id: 897283731
 mas "TestFlight", id: 899247664
-mas "Whisper Transcription", id: 1668083311
-mas "Wipr", id: 1320666476
 mas "Xcode", id: 497799835
 vscode "afzalsayed96.icones"
 vscode "albert.tabout"
@@ -421,7 +419,6 @@ vscode "antfu.goto-alias"
 vscode "antfu.iconify"
 vscode "antfu.icons-carbon"
 vscode "antfu.open-in-github-button"
-vscode "antfu.slidev"
 vscode "antfu.smart-clicks"
 vscode "antfu.theme-vitesse"
 vscode "antfu.unocss"
@@ -429,6 +426,7 @@ vscode "antfu.where-am-i"
 vscode "anthropic.claude-code"
 vscode "anysphere.cursorpyright"
 vscode "anysphere.remote-containers"
+vscode "anysphere.remote-ssh"
 vscode "arcanis.vscode-zipfs"
 vscode "arcticicestudio.nord-visual-studio-code"
 vscode "astro-build.astro-vscode"
@@ -543,3 +541,4 @@ vscode "zignd.html-css-class-completion"
 go "golang.org/x/tools/gopls"
 go "github.com/Picocrypt/CLI/picocrypt"
 go "honnef.co/go/tools/cmd/staticcheck"
+uv "tinybird"

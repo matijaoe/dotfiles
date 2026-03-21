@@ -117,3 +117,6 @@ path_prepend "$PNPM_HOME"
 
 # Allow unquoted URLs with ? and & (otherwise zsh treats them like globs and errors)
 setopt NO_NOMATCH
+
+# opencode
+export PATH=/Users/matijao/.opencode/bin:$PATH

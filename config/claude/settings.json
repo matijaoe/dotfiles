@@ -132,7 +132,13 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:sertxu.dev)",
       "WebFetch(domain:vikramthyagarajan.medium.com)",
-      "WebFetch(domain:kajetan.io)"
+      "WebFetch(domain:kajetan.io)",
+      "Bash(brew list:*)",
+      "Bash(/bin/cat /Users/matijao/.zsh_plugins.txt)",
+      "Bash(/bin/diff:*)",
+      "Bash(/bin/ls:*)",
+      "Bash(mas:*)",
+      "Bash(mas --help:*)"
     ],
     "deny": [
       "Bash(rm -rf:*)",
@@ -305,6 +311,7 @@
     }
   },
   "alwaysThinkingEnabled": true,
+  "effortLevel": "high",
   "autoUpdatesChannel": "latest",
   "skipDangerousModePermissionPrompt": true,
   "showTurnDuration": true,
