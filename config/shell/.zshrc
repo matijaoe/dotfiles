@@ -14,6 +14,8 @@ fpath=(~/.config/shell/completions $fpath)
 # ============================================================
 # compile plugins to bytecode for faster loading
 zstyle ':antidote:*' zcompile 'yes'
+# OMZ update is handled by `antidote update` — suppress OMZ's own prompt
+zstyle ':omz:update' mode disabled
 # use short names in `antidote list` instead of mangled URLs
 zstyle ':antidote:bundle' use-friendly-names 'yes'
 
@@ -86,7 +88,6 @@ path_prepend() {
 
 # n — Node.js version manager
 export N_PREFIX=$HOME/.n
-path_prepend "$N_PREFIX/bin"
 
 # bun — completions + binary
 [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
@@ -118,5 +119,11 @@ path_prepend "$PNPM_HOME"
 # Allow unquoted URLs with ? and & (otherwise zsh treats them like globs and errors)
 setopt NO_NOMATCH
 
+# n — always wins: force-prepend after everything else (path_prepend skips if already present)
+export PATH="$N_PREFIX/bin:$PATH"
+
 # opencode
 export PATH=/Users/matijao/.opencode/bin:$PATH
+
+# Vite+ bin (https://viteplus.dev)
+. "$HOME/.vite-plus/env"
